@@ -1,0 +1,58 @@
+# Raspberry Pi 5
+
+# Config
+
+# OS; Diet Pi OS
+
+# Config for Dietpi
+dietpi-launcher 
+
+sudo apt update
+sudo apt dist-upgrade
+
+sudo apt install -y fakeroot dhcpcd flashrom smartmontools quota rsync xfsdump btrfs-progs mtools f2fs-tools curl openssl
+
+sudo apt install cpufrequtils htop 
+sudo cpufreq-set -g performance
+
+# Install and a firewall:
+sudo apt install ufw
+
+# UFW port settings
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+sudo ufw allow ssh
+sudo ufw allow 53/tcp
+sudo ufw allow 53/udp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp                               # Optional, if using HTTPS
+sudo ufw allow 9090/tcp                              # Need for Cockpit
+
+# Static ipv6 address for the Raspberry Pi
+sudo nano /etc/dhcpcd.conf
+
+interface eth0  # oder wlan0, je nach Verbindung
+# IPv6 Präfix: 2a02:2454:9b5c:3a00::/64
+static ip6_address=2a02:2454:9b5c:3a00::10/64
+
+
+sudo apt install cockpit cockpit-bridge cockpit-networkmanager cockpit-packagekit cockpit-pcp cockpit-storaged 
+
+sudo systemctl enable cockpit
+sudo systemctl start cockpit
+
+
+# DietPi-Software  -> Browse Software
+
+# Install Pi-hole
+dietpi-software install 93
+
+#  Install samba and nfs
+dietpi-software install 96 109
+
+
+# Install XFCE Desktop
+dietpi-software install 25 175 29
+
+

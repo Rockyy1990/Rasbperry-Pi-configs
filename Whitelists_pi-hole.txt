@@ -1,0 +1,324 @@
+Empfohlene Whitelist Einträge
+
+Diese Einträge sollte man in die Whitelist schreiben, damit die Websites und Services richtig funktionieren. Hier gibt es die Einträge als Liste: https://www.technoy.de/lists/whitelist.txt
+Google
+Google (Maps, YouTube usw)
+
+    clients4.google.com
+    clients2.google.com
+
+YouTube History
+
+    s.youtube.com
+    video-stats.l.google.com
+
+Google Play
+
+    android.clients.google.com
+
+    0.client-channel.google.com
+
+    2.android.pool.ntp.org
+
+Moto phones OS updates
+
+    appspot-preview.l.google.com
+
+Google Keep
+
+    reminders-pa.googleapis.com
+    firestore.googleapis.com
+
+Gmail (Google Mail)
+
+    googleapis.l.google.com
+
+Microsoft
+Windows 10 Updates
+
+    a-msedge.net
+    slscr.update.microsoft.com
+    v10.vortex-win.data.microsoft.com
+    settings-win.data.microsoft.com
+
+Windows 10 – Internet Verbindungs Prüfung
+
+    www.msftncsi.com
+    msftncsi.com
+    ipv6.msftncsi.com
+
+Microsoft Web Pages (Outlook, Office365, Live,Microsoft.com)
+
+    outlook.office365.com
+    products.office.com
+    c.s-microsoft.com
+    i.s-microsoft.com
+    login.live.com
+    login.microsoftonline.com
+
+Als Befehl:
+
+pihole -w outlook.office365.com products.office.com c.s-microsoft.com i.s-microsoft.com login.live.com login.microsoftonline.com 
+
+Backup Bitlocker recovery Key zu Microsoft
+
+    g.live.com
+
+Microsoft Store (Windows Store)
+
+    dl.delivery.mp.microsoft.com
+    geo-prod.do.dsp.mp.microsoft.com
+    displaycatalog.mp.microsoft.com
+
+Als Befehl:
+
+pihole -w dl.delivery.mp.microsoft.com geo-prod.do.dsp.mp.microsoft.com displaycatalog.mp.microsoft.com
+
+Xbox Live
+
+    clientconfig.passport.net
+
+Domains die für Xbox Live Achievments genutzt werden (von Microsoft bestätigt)
+
+    v10.events.data.microsoft.com
+    v20.events.data.microsoft.com
+
+Xbox Live Messaging
+
+    client-s.gateway.messenger.live.com
+
+Weitere Domains die für die volle Funktionalität von Xbox Live nötig sind
+
+    xbox.ipv6.microsoft.com
+    device.auth.xboxlive.com
+    www.msftncsi.com
+    title.mgt.xboxlive.com
+    xsts.auth.xboxlive.com
+    title.auth.xboxlive.com
+    ctldl.windowsupdate.com
+    attestation.xboxlive.com
+    xboxexperiencesprod.experimentation.xboxlive.com
+    xflight.xboxlive.com
+    cert.mgt.xboxlife.com
+    xkms.xboxlive.com
+    def-vef.xboxlive.com
+    notify.xboxlive.com
+    help.ui.xboxlive.com
+    licensing.xboxlive.com
+    eds.xboxlive.com
+    www.xboxlive.com
+    v10.vortex-win.data.microsoft.com
+    settings-win.data.microsoft.com
+
+Als Befehl:
+
+pihole -w xbox.ipv6.microsoft.com device.auth.xboxlive.com www.msftncsi.com title.mgt.xboxlive.com xsts.auth.xboxlive.com title.auth.xboxlive.com ctldl.windowsupdate.com attestation.xboxlive.com xboxexperiencesprod.experimentation.xboxlive.com xflight.xboxlive.com cert.mgt.xboxlive.com xkms.xboxlive.com def-vef.xboxlive.com notify.xboxlive.com help.ui.xboxlive.com licensing.xboxlive.com eds.xboxlive.com www.xboxlive.com v10.vortex-win.data.microsoft.com settings-win.data.microsoft.com
+
+Skype
+
+    s.gateway.messenger.live.com
+    client-s.gateway.messenger.live.com
+    ui.skype.com
+    pricelist.skype.com
+    apps.skype.com
+    m.hotmail.com
+    sa.symcb.com
+    s{1..5}.symcb.com
+
+Als Befehl:
+
+pihole -w s.gateway.messenger.live.com client-s.gateway.messenger.live.com ui.skype.com pricelist.skype.com apps.skype.com m.hotmail.com sa.symcb.com s{1..5}.symcb.com
+
+Microsoft Office
+
+    officeclient.microsoft.com
+
+Bing Maps Platform
+
+    dev.virtualearth.net
+    ecn.dev.virtualearth.net
+    t0.ssl.ak.dynamic.tiles.virtualearth.net
+    t0.ssl.ak.tiles.virtualearth.net
+
+Apple
+Apple Music
+
+    itunes.apple.com
+    s.mzstatic.com
+
+Apple ID
+
+    appleid.apple.com
+
+IOS
+
+    captive.apple.com
+    gsp1.apple.com
+    www.apple.com
+    www.appleiphonecell.com
+
+Als Befehl:
+
+pihole -w captive.apple.com gsp1.apple.com www.apple.com www.appleiphonecell.com
+
+Nvidia
+NVIDIA GeForce Experience
+
+Die Treiber benötigen diese Domain, gleichzeitig werden Statistiken erhoben.
+
+    gfwsl.geforce.com
+
+Websites / Apps
+Link Shortners:
+
+    www.bit.ly
+    bit.ly
+    ow.ly
+    tinyurl.com
+    adfoc.us
+
+Als Befehl
+
+pihole -w www.bit.ly bit.ly ow.ly tinyurl.com adfoc.us
+
+Content Delivery
+EA / Origin
+
+    cdn.optimizely.com (Used by Origin for content delivery)
+    s.shopify.com
+
+Dropbox
+
+    dl.dropboxusercontent.com
+    ns1.dropbox.com
+    ns2.dropbox.com
+
+Als Befehl:
+
+pihole -w dl.dropboxusercontent.com ns1.dropbox.com ns2.dropbox.com
+
+Google Chrome (Updates unter Ubuntu)
+
+    dl.google.com
+
+Streaming
+Spotify
+
+Ohne diese Domains auf der Whitelist, funktioniert der IOS Client nicht mehr.
+
+    spclient.wg.spotify.com
+    apresolve.spotify.com
+
+Apple Music
+
+    itunes.apple.com
+    s.mzstatic.com
+
+Plex.tv
+
+    plex.tv
+    tvdb2.plex.tv
+    pubsub.plex.bz
+    proxy.plex.bz
+    proxy02.pop.plex.bz
+    cpms.spop10.ams.plex.bz
+    meta-db-worker02.pop.ric.plex.bz
+    meta.plex.bz
+    tvthemes.plexapp.com.cdn.cloudflare.net
+    tvthemes.plexapp.com
+    106c06cd218b007d-b1e8a1331f68446599e96a4b46a050f5.ams.plex.services meta.plex.tv
+    cpms35.spop10.ams.plex.bz
+    proxy.plex.tv
+    metrics.plex.tv
+    pubsub.plex.tv
+    status.plex.tv
+    www.plex.tv
+    node.plexapp.com
+    nine.plugins.plexapp.com
+    staging.plex.tv
+    app.plex.tv
+    o1.email.plex.tv
+    o2.sg0.plex.tv
+    dashboard.plex.tv
+    thetvdb.com
+    themoviedb.com
+
+Als Befehl:
+
+pihole -w themoviedb.com thetvdb.com plex.tv tvdb2.plex.tv pubsub.plex.bz proxy.plex.bz proxy02.pop.ord.plex.bz cpms.spop10.ams.plex.bz meta-db-worker02.pop.ric.plex.bz meta.plex.bz tvthemes.plexapp.com.cdn.cloudflare.net tvthemes.plexapp.com 106c06cd218b007d-b1e8a1331f68446599e96a4b46a050f5.ams.plex.services meta.plex.tv cpms35.spop10.ams.plex.bz proxy.plex.tv metrics.plex.tv pubsub.plex.tv status.plex.tv www.plex.tv node.plexapp.com nine.plugins.plexapp.com staging.plex.tv app.plex.tv o1.email.plex.tv  o2.sg0.plex.tv dashboard.plex.tv
+
+Grand Theft Auto V Online PC
+
+Seit März scheint die Blockierung der Rockstar-Telemetrie GTAOnline zum Absturz zu bringen.
+
+    prod.telemetry.ros.rockstargames.com
+
+Epic Games Store
+
+    tracking.epicgames.com
+
+Cashback (Shoop.de)
+
+    www.awin1.com
+    zenaps.com
+
+Spiegel.de
+
+    sourcepoint.mgr.consensu.org
+    spiegel-de.spiegel.de
+
+Bild.de
+
+    ec-ns.sascdn.com
+    cdn1.smartadserver.com
+    acdn.adnxs.com
+
+Facebook.com
+
+    scontent.xx.fbcdn.net
+    connect.facebook.net
+    star.c10r.facebook.com
+    static.xx.fbcdn.net
+    de-de.facebook.com
+    upload.facebook.com
+    creative.ak.fbcdn.net
+    external-lhr0-1.xx.fbcdn.net
+    external-lhr1-1.xx.fbcdn.net
+    external-lhr10-1.xx.fbcdn.net
+    external-lhr2-1.xx.fbcdn.net
+    external-lhr3-1.xx.fbcdn.net
+    external-lhr4-1.xx.fbcdn.net
+    external-lhr5-1.xx.fbcdn.net
+    external-lhr6-1.xx.fbcdn.net
+    external-lhr7-1.xx.fbcdn.net
+    external-lhr9-1.xx.fbcdn.net
+    fbcdn-creative-a.akamaihd.net
+    scontent-lhr3-1.xx.fbcdn.net
+    fgdl5-1.fna.fbcdn.net
+    cdn.fbsbx.com
+    api.facebook.com
+    edge-mqtt.facebook.com
+    mmqtt.c10r.facebook.com
+    portal.fb.com
+    star.c10r.facebook.com
+    star-mini.c10r.facebook.com
+    b-api.facebook.com
+    fb.me
+    bigzipfiles.facebook.com
+    l.facebook.com
+
+Als Befehl:
+
+pihole -w upload.facebook.com creative.ak.fbcdn.net external-lhr0-1.xx.fbcdn.net external-lhr1-1.xx.fbcdn.net external-lhr10-1.xx.fbcdn.net external-lhr2-1.xx.fbcdn.net external-lhr3-1.xx.fbcdn.net external-lhr4-1.xx.fbcdn.net external-lhr5-1.xx.fbcdn.net external-lhr6-1.xx.fbcdn.net external-lhr7-1.xx.fbcdn.net external-lhr8-1.xx.fbcdn.net external-lhr9-1.xx.fbcdn.net fbcdn-creative-a.akamaihd.net scontent-lhr3-1.xx.fbcdn.net scontent.xx.fbcdn.net scontent.fgdl5-1.fna.fbcdn.net graph.facebook.com b-graph.facebook.com connect.facebook.com cdn.fbsbx.com api.facebook.com edge-mqtt.facebook.com mqtt.c10r.facebook.com portal.fb.com star.c10r.facebook.com star-mini.c10r.facebook.com b-api.facebook.com fb.me bigzipfiles.facebook.com l.facebook.com
+
+HayDay (Handyspiel)
+
+    game-assets.haydaygame.com
+    game.haydaygame.com
+
+Jackbox.tv
+
+Jackbox.tv lädt nicht wenn google-analystics nicht auf der Whitelist sind.
+
+    www.google-analystics.com
+    ssl.google-analystics.com

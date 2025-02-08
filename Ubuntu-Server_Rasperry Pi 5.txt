@@ -1,0 +1,61 @@
+
+# Rasperry Pi 5
+
+# Ubuntu-Server LTS
+
+sudo apt update
+sudo apt dist-upgrade
+sudo apt install raspi-config flashrom quota
+sudo apt install samba fakeroot xfsdump ufw openssl smartmontools
+sudo apt install nfs-kernel-server
+
+# Check for new firmware
+sudo rpi-eeprom-update
+
+# Install latest firmware
+sudo rpi-eeprom-update -a
+
+
+
+sudo ufw enable
+sudo ufw allow 10000
+
+# Best Firewall config for Pi-Hole etc
+sudo ufw allow ssh
+sudo ufw allow 53/tcp
+sudo ufw allow 53/udp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp                               # Optional, if using HTTPS
+sudo ufw allow from 192.168.1.0/24 to any port 80
+sudo ufw allow from 192.168.1.0/24 to any port 443   # Optional
+
+
+Pipewire
+
+sudo add-apt-repository ppa:pipewire-debian/pipewire-upstream
+
+sudo apt update
+sudo apt install pipewire pipewire-audio-client-libraries
+
+$ sudo apt install gstreamer1.0-pipewire libpipewire-0.3-{0,dev,modules} libspa-0.2-{bluetooth,dev,jack,modules} pipewire{,-{audio-client-libraries,pulse,bin,locales,tests}} wireplumber
+
+systemctl --user daemon-reload
+systemctl --user --now enable pipewire pipewire-pulse
+
+
+
+# Install a desktop via tasksel
+# sudo apt install tasksel
+
+# Pi-Hole
+sudo apt install curl
+curl -sSL https://install.pi-hole.net | bash
+
+
+# Install Webmin
+curl -o webmin-setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/webmin-setup-repos.sh
+sudo sh webmin-setup-repos.sh
+
+sudo apt-get install webmin --install-recommends
+
+In Webbrowser: https://<Your-Server-IP>:10000

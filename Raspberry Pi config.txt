@@ -1,0 +1,176 @@
+# Raspberry Pi 5
+
+# Config
+
+# OS; Raspberry OS Lite 64bit
+
+# On bootet Rasperry Pi (Linux)
+# ssh: lxdmin@192.168.0.3   (change the last number to right one)
+# On Error; WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @
+# ssh-keygen -R 192.168.0.3
+
+# Rasperry Shutdown (Version 5 and newer): 1. Power Button  2. or over ssh: sudo poweroff
+
+
+sudo apt update
+sudo apt dist-upgrade
+
+# Set root passwod (if is not allready set)
+sudo passwd root
+
+sudo apt install -y fakeroot dhcpcd flashrom smartmontools quota rsync xfsdump btrfs-progs mtools f2fs-tools curl openssl samba nfs-kernel-server
+sudo apt install cpufrequtils htop libpam-runtime python unzip apache2 
+sudo cpufreq-set -g performance
+
+sudo apt install cockpit cockpit-bridge cockpit-networkmanager cockpit-packagekit cockpit-pcp cockpit-storaged    
+
+sudo systemctl enable cockpit
+sudo systemctl start cockpit
+
+
+# Static ipv6 address for the Raspberry Pi
+sudo nano /etc/dhcpcd.conf
+
+interface eth0  # oder wlan0, je nach Verbindung
+# IPv6 Präfix: 2a02:2454:9b5c:3a00::/64
+static ip6_address=2a02:2454:9b5c:3a00::10/64  
+
+
+
+# Install and a firewall:
+sudo apt install ufw
+
+# UFW port settings
+
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+sudo ufw allow ssh
+sudo ufw allow 53/tcp
+sudo ufw allow 53/udp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp                               # Optional, if using HTTPS
+sudo ufw allow 9090/tcp                              # Need for Cockpit
+sudo ufw allow from 192.168.1.0/24 to any port 80
+sudo ufw allow from 192.168.1.0/24 to any port 443   # Optional
+
+
+sudo ufw enable
+
+
+Webbrowser
+http://<ip_address>:9090
+
+
+# Install latest stable kernel
+sudo apt install raspberrypi-kernel
+
+
+# Recommended /boot/config.txt Settings for Raspberry Pi 5
+
+# Enable the onboard audio (loads snd_bcm2835)
+dtparam=audio=on
+
+# Overclocking settings (optional)
+# Uncomment and adjust these settings if you want to overclock
+# over_voltage=6
+# arm_freq=2200
+
+# Set the GPU memory split (gpu_men=16 for terminal based use only)
+gpu_mem=128
+
+# Enable the 64-bit kernel (if not already enabled)
+arm_64bit=1
+
+# Set the HDMI output to a specific mode (optional)
+hdmi_group=1
+hdmi_mode=16  # 1080p @ 60Hz
+
+# Enable USB boot (if needed)
+program_usb_boot_mode=1
+
+# Enable the camera interface (if using a camera)
+start_x=1
+
+# Enable the I2C interface (if using I2C devices)
+dtparam=i2c_arm=on
+
+# Enable SPI interface (if using SPI devices)
+dtparam=spi=on
+
+# Enable the 1-wire interface (if using 1-wire devices)
+dtoverlay=w1-gpio
+
+# Enable the GPIO pins (if needed)
+# dtoverlay=gpio-keys
+
+# Set the maximum CPU temperature (optional)
+# temp_limit=85
+
+# Disable the rainbow splash screen (optional)
+disable_splash=1
+
+# Set the boot delay (optional)
+boot_delay=0
+
+# Enable the serial console (if needed)
+enable_uart=1
+
+# Set the HDMI safe mode (optional)
+hdmi_safe=1
+
+# Uncomment to enable the Pi-hole DNS server (if using Pi-hole)
+# dtoverlay=pi3-disable-bt
+
+# Uncomment to enable the Pi-hole DHCP server (if using Pi-hole)
+# dhcp-range=192.168.1.100,192.168.1.200,24h
+
+
+
+
+
+
+# Webmin
+curl -o webmin-setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/webmin-setup-repos.sh
+sudo sh webmin-setup-repos.sh
+
+sudo apt-get install webmin --install-recommends
+
+# After install and config.
+https://192.68.0.3:10000
+
+
+
+
+# Pi-Hole:
+
+curl -sSL https://install.pi-hole.net | bash
+
+# After install and config. 
+http://192.168.0.3/admin
+
+
+
+
+# Webserver with Lighttpd
+
+Lighttpd without php supports static webseites. (HTML, CSS and JavaScript)
+
+sudo apt install lighttpd -y
+
+Now you can put static files (HTML, CSS, JavaScript) in this directory: /var/www/html/
+
+After this you must restart lighttpd:
+
+sudo service lighttpd restart
+
+Webbrowser:
+
+http://<ip-address>/index.html
+
+
+
+
+
+
+

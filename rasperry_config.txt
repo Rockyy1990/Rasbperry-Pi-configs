@@ -1,0 +1,33 @@
+Rasperry Config
+
+Rasperry Shutdown (Version 5 and newer): 1. Power Button 2. or over ssh: sudo poweroff
+
+1. Rasperry Pi Imager
+Set Rasperry Type
+Set Image Type (default is Rasperry OS)
+Set Username and Password
+Set Timezone and Keyboard layout de
+
+On bootet Rasperry Pi
+ssh: lxdmin@192.168.0.3   (change the last number to right one)
+On Error; WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @
+ssh-keygen -R 192.168.0.3
+
+sudo apt update
+sudo apt dist-upgrade
+
+sudo apt isntall xrdp  (for remote)
+sudo raspi-config > System Options > Enable boot to Desktop (without Autologin)
+
+
+
+
+
+
+
+
+
+
+
+
+
