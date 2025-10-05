@@ -79,6 +79,7 @@ https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/child-prot
 https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Fake-Science
 
 
+
 # Facebook
 https://raw.githubusercontent.com/crpietschmann/pi-hole-blocklist/main/social-media/blocklist-social-facebook.txt
 
@@ -86,7 +87,8 @@ https://raw.githubusercontent.com/crpietschmann/pi-hole-blocklist/main/social-me
 https://raw.githubusercontent.com/crpietschmann/pi-hole-blocklist/main/social-media/blocklist-social-tiktok.txt
 
 
-# Wildcard Blocklist
+
+# Wildcard Blocklist (Amazon Prime Video will dont work)
 https://raw.githubusercontent.com/ph00lt0/blocklist/refs/heads/master/wildcard-blocklist.txt
 
 # Prigent-Ads
@@ -97,6 +99,18 @@ https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt
 
 # Blocklist - Simple Tracking
 https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
+
+
+# HaGeZis Ultimate Blocklist
+https://adguardteam.github.io/HostlistsRegistry/assets/filter_49.txt
+
+# HaGeZis Anti-Privacy
+https://adguardteam.github.io/HostlistsRegistry/assets/filter_46.txt
+
+# Roku Blocklist
+https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/domains/native.roku.txt
+
+
 
 
 
