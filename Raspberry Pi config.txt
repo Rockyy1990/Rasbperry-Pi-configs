@@ -5,66 +5,11 @@
 # OS; Raspberry OS Lite 64bit
 
 # On bootet Rasperry Pi (Linux)
-# ssh: lxdmin@192.168.0.3   (change the last number to right one)
+# ssh: USERNAME@<IP-ADRESS>   
 # On Error; WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED! @
 # ssh-keygen -R 192.168.0.3
 
-# Rasperry Shutdown (Version 5 and newer): 1. Power Button  2. or over ssh: sudo poweroff
-
-
-sudo apt update
-sudo apt dist-upgrade
-
-# Set root passwod (if is not allready set)
-sudo passwd root
-
-sudo apt install -y fakeroot dhcpcd flashrom smartmontools quota rsync xfsdump btrfs-progs mtools f2fs-tools curl openssl samba nfs-kernel-server
-sudo apt install cpufrequtils htop libpam-runtime python unzip apache2 
-sudo cpufreq-set -g performance
-
-sudo apt install cockpit cockpit-bridge cockpit-networkmanager cockpit-packagekit cockpit-pcp cockpit-storaged    
-
-sudo systemctl enable cockpit
-sudo systemctl start cockpit
-
-
-# Static ipv6 address for the Raspberry Pi
-sudo nano /etc/dhcpcd.conf
-
-interface eth0  # oder wlan0, je nach Verbindung
-# IPv6 Präfix: 2a02:2454:9b5c:3a00::/64
-static ip6_address=2a02:2454:9b5c:3a00::10/64  
-
-
-
-# Install and a firewall:
-sudo apt install ufw
-
-# UFW port settings
-
-sudo ufw default deny incoming
-sudo ufw default allow outgoing
-
-sudo ufw allow ssh
-sudo ufw allow 53/tcp
-sudo ufw allow 53/udp
-sudo ufw allow 80/tcp
-sudo ufw allow 443/tcp                               # Optional, if using HTTPS
-sudo ufw allow 9090/tcp                              # Need for Cockpit
-sudo ufw allow from 192.168.1.0/24 to any port 80
-sudo ufw allow from 192.168.1.0/24 to any port 443   # Optional
-
-
-sudo ufw enable
-
-
-Webbrowser
-http://<ip_address>:9090
-
-
-# Install latest stable kernel
-sudo apt install raspberrypi-kernel
-
+-----------------------------------------------------------------------------------------
 
 # Recommended /boot/config.txt Settings for Raspberry Pi 5
 
@@ -124,9 +69,51 @@ hdmi_safe=1
 
 # Uncomment to enable the Pi-hole DHCP server (if using Pi-hole)
 # dhcp-range=192.168.1.100,192.168.1.200,24h
+-----------------------------------------------------------------------------
+
+# Rasperry Shutdown (Version 5 and newer): 1. Power Button  2. or over ssh: sudo poweroff
+
+sudo apt update
+sudo apt upgrade -y
+sudo apt dist-upgrade -y
+
+# Set root passwod (if is not allready set)
+sudo passwd root
+
+# Install basic needed packages
+sudo apt install -y fakeroot flashrom smartmontools quota rsync xfsdump mtools f2fs-tools curl openssl samba apache2 ufw
+sudo apt install cpufrequtils htop libpam-runtime python unzip 
+sudo cpufreq-set -g performance
+
+
+# Static ipv6 address for the Raspberry Pi (if needed)
+sudo nano /etc/dhcpcd.conf
+
+interface eth0  # oder wlan0, je nach Verbindung
+# IPv6 Präfix: 2a02:2454:9b5c:3a00::/64
+static ip6_address=2a02:2454:9b5c:3a00::10/64  
 
 
 
+# UFW port settings
+
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+sudo ufw allow ssh
+sudo ufw allow 53/tcp
+sudo ufw allow 53/udp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp                               # Optional, if using HTTPS
+sudo ufw allow 9090/tcp                              # Need for Cockpit
+sudo ufw allow from 192.168.1.0/24 to any port 80
+sudo ufw allow from 192.168.1.0/24 to any port 443   # Optional
+
+sudo ufw enable
+
+
+# Install latest stable kernel
+sudo apt install raspberrypi-kernel
 
 
 
@@ -137,23 +124,51 @@ sudo sh webmin-setup-repos.sh
 sudo apt-get install webmin --install-recommends
 
 # After install and config.
-https://192.68.0.3:10000
+https://< IP-Adress>:10000
+
+
+# Installing Cockpit (Web Interface)
+sudo apt install cockpit cockpit-bridge cockpit-networkmanager cockpit-packagekit cockpit-pcp cockpit-storaged    
+sudo systemctl enable cockpit
+sudo systemctl start cockpit
+
+Webbrowser
+http://<ip_address>:9090
+
+
+
+# Install Grafana (Monitoring)
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
+echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+sudo apt update
+sudo apt install grafana
+
+sudo /bin/systemctl daemon-reload
+sudo /bin/systemctl enable grafana-server
+sudo /bin/systemctl start grafana-server
+
+# First access after install 
+http://<RASPBERRYPI_IP>:3000
 
 
 
 
-# Pi-Hole:
-
+# Install Pi-Hole
 curl -sSL https://install.pi-hole.net | bash
 
 # After install and config. 
-http://192.168.0.3/admin
+http://<IP-Adress>/admin
 
+
+# Install Adguard Home
+curl -s -S -L https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -v
+
+# After install for config
+http://<IP-Adress>:3000
 
 
 
 # Webserver with Lighttpd
-
 Lighttpd without php supports static webseites. (HTML, CSS and JavaScript)
 
 sudo apt install lighttpd -y
