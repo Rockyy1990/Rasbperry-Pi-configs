@@ -2,9 +2,11 @@
 # Recommended Regex and Blocklists for Pi-Hole , Adguard Home
 #
 
-# Last Edit 06.10.2025
+# Last Edit: 06.10.2025
 
+#
 # Regular Expressions (Regex): 
+#
 
 ^(.+[_.-])?adse?rv(er?|ice)?s?[0-9]*[_.-]
 ^(.+[_.-])?telemetry[_.-]
@@ -26,7 +28,9 @@
 ^https?://(www\.)?xhamsterlive\.com/(en|de|fr)/[a-zA-Z0-9_-]+$
 
 
+#
 # Blocklists
+#
 
 # Easylist
 https://easylist.to/easylist/easylist.txt
@@ -71,10 +75,6 @@ https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/DomainSqua
 https://raw.githubusercontent.com/blocklistproject/Lists/master/ransomware.txt
 
 
-# Jugendschutz
-https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/child-protection
-
-
 # Fake Science
 https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Fake-Science
 
@@ -85,6 +85,9 @@ https://raw.githubusercontent.com/crpietschmann/pi-hole-blocklist/main/social-me
 
 # Tiktok
 https://raw.githubusercontent.com/crpietschmann/pi-hole-blocklist/main/social-media/blocklist-social-tiktok.txt
+
+# Jugendschutz
+https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/child-protection
 
 
 
@@ -109,6 +112,7 @@ https://adguardteam.github.io/HostlistsRegistry/assets/filter_46.txt
 
 # Roku Blocklist
 https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/domains/native.roku.txt
+
 
 
 
