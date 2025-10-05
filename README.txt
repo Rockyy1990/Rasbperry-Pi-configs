@@ -1,8 +1,9 @@
-#
-# Recommended Regex and Blocklists for Pi-Hole , Adguard Home
-#
 
-# Last Edit: 06.10.2025
+Last Edit: 06.10.2025
+
+#
+# Regex and Blocklists for Pi-Hole , Adguard Home
+#
 
 #
 # Regular Expressions (Regex): 
@@ -32,86 +33,87 @@
 # Blocklists
 #
 
-# Easylist
+Easylist
 https://easylist.to/easylist/easylist.txt
 
-# Easyprivacy
+Easyprivacy
 https://github.com/ZingyAwesome/easylists-for-pihole/blob/master/easyprivacy.txt
 
 
-# Fanboy's Annoyance List
+Fanboy's Annoyance List
 https://easylist.to/easylist/fanboy-annoyance.txt
 
-# Spam404
+Spam404
 https://raw.githubusercontent.com/Spam404/lists/master/main-blacklist.txt
 
-# NoCoin
+NoCoin
 https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/nocoin.txt
 
 
-# Phishing
+Phishing
 https://phishing.army/download/phishing_army_blocklist.txt
 
 
-# NoProxies
+NoProxies
 https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/proxies
 
 
-# Gambling
+Gambling
 https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/gambling
 
 
-# Streaming
+Streaming
 https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Streaming
 
 
-# Domain Squatting
+Domain Squatting
 https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/DomainSquatting1
 
 https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/DomainSquatting2
 
 
-# Ransomware
+Ransomware
 https://raw.githubusercontent.com/blocklistproject/Lists/master/ransomware.txt
 
 
-# Fake Science
+Fake Science
 https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Fake-Science
 
 
 
-# Facebook
+Facebook
 https://raw.githubusercontent.com/crpietschmann/pi-hole-blocklist/main/social-media/blocklist-social-facebook.txt
 
-# Tiktok
+Tiktok
 https://raw.githubusercontent.com/crpietschmann/pi-hole-blocklist/main/social-media/blocklist-social-tiktok.txt
 
-# Jugendschutz
+Jugendschutz
 https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/child-protection
 
 
 
-# Wildcard Blocklist (Amazon Prime Video will dont work)
+Wildcard Blocklist (Amazon Prime Video will dont work)
 https://raw.githubusercontent.com/ph00lt0/blocklist/refs/heads/master/wildcard-blocklist.txt
 
-# Prigent-Ads
+Prigent-Ads
 https://v.firebog.net/hosts/Prigent-Ads.txt
 
-# Blocklist - Adservers
+Blocklist - Adservers
 https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt
 
-# Blocklist - Simple Tracking
+Blocklist - Simple Tracking
 https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
 
 
-# HaGeZis Ultimate Blocklist
+HaGeZis Ultimate Blocklist
 https://adguardteam.github.io/HostlistsRegistry/assets/filter_49.txt
 
-# HaGeZis Anti-Privacy
+HaGeZis Anti-Privacy
 https://adguardteam.github.io/HostlistsRegistry/assets/filter_46.txt
 
-# Roku Blocklist
+Roku Blocklist
 https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/domains/native.roku.txt
+
 
 
 
