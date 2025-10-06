@@ -150,7 +150,7 @@ http://<ip_address>:9090
 # MiniDLNA Server (Video,Audio streaming)
 sudo apt install -y minidlna
 
-# No you must config them 
+# Now you must config them 
 
 # Example (A=Audio, P= Pictures, V=Video)
 media_dir=A,/mnt/mediaDrive/audio
