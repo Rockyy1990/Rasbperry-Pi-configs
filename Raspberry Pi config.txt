@@ -147,6 +147,24 @@ Webbrowser
 http://<ip_address>:9090
 
 
+# MiniDLNA Server (Video,Audio streaming)
+sudo apt install -y minidlna
+
+# No you must config them 
+
+# Example (A=Audio, P= Pictures, V=Video)
+media_dir=A,/mnt/mediaDrive/audio
+media_dir=P,/mnt/mediaDrive/pictures
+media_dir=V,/mnt/mediaDrive/videos
+
+# Search for "#friendly_name=" and set a name for the dlna server
+
+sudo nano /etc/minidlna.conf
+
+# After setting up the dlna server
+sudo systemctl restart minidlna
+
+
 
 # Install Grafana (Monitoring)
 wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
