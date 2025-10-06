@@ -163,7 +163,7 @@ sudo nano /etc/minidlna.conf
 
 # After setting up the dlna server
 sudo systemctl restart minidlna
-
+sudo ufw allow 8200/tcp (if you use ufw firewall)
 
 
 # Install Grafana (Monitoring)
@@ -211,6 +211,7 @@ sudo service lighttpd restart
 Webbrowser:
 
 http://<ip-address>/index.html
+
 
 
 
