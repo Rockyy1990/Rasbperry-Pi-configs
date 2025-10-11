@@ -85,10 +85,12 @@ sudo apt install rpi-update
 sudo rpi-update
 
 # Install basic needed packages
-sudo apt install -y binutils binfmt-support fakeroot sdparm flashrom smartmontools quota rsync xfsdump mtools curl ufw
+sudo apt install -y binutils binfmt-support fakeroot hdparm sdparm flashrom smartmontools quota rsync xfsdump mtools curl ufw
 sudo apt install -y samba openssl libnss-winbind apache2 unattended-upgrades autodir autofs clonezilla
-sudo apt install -y htop libpam-winbind libpam-runtime python3 python3-pip unzip ffmpeg rtkit
+sudo apt install -y htop powertop libpam-winbind libpam-runtime python3 python3-pip unzip ffmpeg rtkit
 
+(you can set: conservative ondemand userspace powersave performance schedutil)
+echo schedutil | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
 
 
 # Static ipv6 address for the Raspberry Pi (if needed)
