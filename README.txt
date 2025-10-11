@@ -1,5 +1,32 @@
 
-Last Edit: 06.10.2025
+Last Edit: 10.10.2025
+
+#
+# Upstream DNS
+#
+
+https://dns.cloudflare.com/dns-query
+9.9.9.9
+208.67.222.222
+2606:4700:4700::1111
+2620:fe::fe
+2620:fe::9
+2620:0:ccc::2
+
+
+#
+# Fallback DNS
+#
+
+8.8.8.8
+8.8.4.4
+149.112.112.112
+208.67.220.220
+2606:4700:4700::1001
+2001:4860:4860::8844
+2001:4860:4860::8888
+
+
 
 #
 # Regex and Blocklists for Pi-Hole , Adguard Home
@@ -28,6 +55,13 @@ Last Edit: 06.10.2025
 ^https?://(www\.)?livejasmin\.com/(en|de|fr)/[a-zA-Z0-9_-]+$
 ^https?://(www\.)?xhamsterlive\.com/(en|de|fr)/[a-zA-Z0-9_-]+$
 
+^https?://[^/]+/.*(adserver|ads|advert|advertising|banner|track|tracker|pixel|collect|doubleclick|googlesyndication|
+^https?://[^/]+/.*(google-analytics|ga|gtm|googletagmanager|collect|analytics)
+^https?://[^/]+/.*(facebook|twitter).(com|net|org)
+^https?://[^/]+/.*(criteo|openx|rubicon|pulse|appnexus|adnxs|advertising|adsystem)
+^https?://[^/]+/.*(doubleclick|googlevideo|videoad|adservice|adsbygoogle)
+
+
 
 #
 # Blocklists
@@ -37,7 +71,7 @@ Easylist
 https://easylist.to/easylist/easylist.txt
 
 Easyprivacy
-https://github.com/ZingyAwesome/easylists-for-pihole/blob/master/easyprivacy.txt
+https://raw.githubusercontent.com/ZingyAwesome/easylists-for-pihole/refs/heads/master/easyprivacy.txt
 
 
 Fanboy's Annoyance List
@@ -113,7 +147,6 @@ https://adguardteam.github.io/HostlistsRegistry/assets/filter_46.txt
 
 Roku Blocklist
 https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/domains/native.roku.txt
-
 
 
 

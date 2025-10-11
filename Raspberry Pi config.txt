@@ -80,6 +80,10 @@ sudo apt dist-upgrade -y
 # Set root passwod (if is not allready set)
 sudo passwd root
 
+# Latest Firmware
+sudo apt install rpi-update
+sudo rpi-update
+
 # Install basic needed packages
 sudo apt install -y binutils binfmt-support fakeroot sdparm flashrom smartmontools quota rsync xfsdump mtools curl ufw
 sudo apt install -y samba openssl libnss-winbind apache2 unattended-upgrades autodir autofs clonezilla
@@ -121,9 +125,6 @@ sudo ufw enable
 # After add more rules after config (reload ufw)
 sudo ufw reload
 
-
-# Install latest stable kernel
-sudo apt install raspberrypi-kernel
 
 
 
@@ -211,7 +212,6 @@ sudo service lighttpd restart
 Webbrowser:
 
 http://<ip-address>/index.html
-
 
 
 
