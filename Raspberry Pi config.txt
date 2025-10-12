@@ -202,15 +202,19 @@ http://<IP-Adress>:3000
 
 # Set APM and HDD Spindown/Idle for HDD (hdparm) (set /dev/sda to the right disk like /dev/sdb)
 
+# hdparm -B 254 for performance
+# hdparm -B 128 for powersaving
+
 sudo touch /etc/udev/rules.d/69-hdparm.rules
 
 echo "
-ACTION=="add", SUBSYSTEM=="block", KERNEL=="sda", RUN+="/usr/bin/hdparm -B 254 -S 240 /dev/sda"
+ACTION=="add", SUBSYSTEM=="block", KERNEL=="sda", RUN+="/usr/sbin/hdparm -B 254 -S 240 /dev/sda"
 " | sudo tee -a /etc/udev/rules.d/69-hdparm.rules
 
 # Reload udev rules
 sudo udevadm control --reload-rules
-
+sudo udevadm trigger
+# (to ensure the udev rules are load correctly you should restart the raspberry pi)
 
 
 
