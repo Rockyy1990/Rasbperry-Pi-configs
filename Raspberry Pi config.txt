@@ -273,28 +273,15 @@ sudo nano /etc/systemd/system/hdd-spindown.service
 Description=Spindown HDD
 
 [Service]
-ExecStart=/usr/sbin/hdparm -y /dev/sda
+Type=simple
+ExecStart=/usr/sbin/hdparm -B 127 -S 240 -y /dev/sda
 
 [Install]
 WantedBy=multi-user.target
 
+# Enable the service
+sudo systemctl enable hdd-spindown.service
 
-# creating a timer for hdd spindown
-sudo nano /etc/systemd/system/hdd-spindown.timer
-
-[Unit]
-Description=Timer for Spindown HDD
-
-[Timer]
-OnActiveSec=20min
-Unit=hdd-spindown.service
-
-[Install]
-WantedBy=timers.target
-
-
-sudo systemctl enable hdd-spindown.timer
-sudo systemctl start hdd-spindown.timer
 
 
 
