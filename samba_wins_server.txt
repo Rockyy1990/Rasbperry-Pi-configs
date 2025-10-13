@@ -1,0 +1,40 @@
+# Samba as Wins-Server
+
+# /etc/samba/smb.conf
+
+[global]
+   netbios name = raspberrypi
+   workgroup = WORKGROUP
+   wins support = yes
+   dns proxy = no
+
+# Share definitions
+[Shared]
+   path = /home/pi/shared
+   available = yes
+   valid users = pi
+   read only = no
+   browsable = yes
+   public = yes
+   writable = yes
+   
+
+# Create the shared directory
+echo "Creating shared directory..."
+mkdir -p /home/pi/shared
+
+# Set permissions for the shared directory
+echo "Setting permissions..."
+sudo chown -R pi:pi /home/pi/shared
+sudo chmod -R 0777 /home/pi/shared
+
+# Restart Samba service to apply changes
+echo "Restarting Samba service..."
+sudo systemctl restart smbd
+sudo systemctl restart nmbd
+
+# Enable Samba service to start at boot
+echo "Enabling Samba service at boot..."
+sudo systemctl enable smbd
+sudo systemctl enable nmbd
+
