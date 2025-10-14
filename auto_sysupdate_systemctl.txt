@@ -1,0 +1,82 @@
+﻿
+====================
+
+Um regelmäßige Debian-Updates alle 6 Tage um 4 Uhr nachts durchzuführen und anschließend `apt autoremove` auszuführen sowie das System neu zu starten, kannst du einen Systemd-Timer zusammen mit einem Skript verwenden. Hier ist eine Schritt-für-Schritt-Anleitung:
+
+## 1. Erstelle das Skript
+
+Zuerst erstelle ein Skript, das die Updates durchführt. Erstelle eine Datei, z. B. `/usr/local/bin/update-system.sh` und füge den folgenden Inhalt hinzu:
+
+```bash
+#!/bin/bash
+
+# System-Updates durchführen
+apt update && apt upgrade -y
+
+# Automatische Paketbereinigung
+apt autoremove -y
+
+# System neu starten
+reboot
+```
+
+Stelle sicher, dass das Skript ausführbar ist:
+
+```bash
+sudo chmod +x /usr/local/bin/update-system.sh
+```
+
+## 2. Erstelle eine Systemd-Dienstdatei
+
+Erstelle eine Dienstdatei, z. B. `/etc/systemd/system/update-system.service` mit folgendem Inhalt:
+
+```ini
+[Unit]
+Description=Automatische System-Updates
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/update-system.sh
+```
+
+## 3. Erstelle eine Systemd-Timer-Datei
+
+Erstelle eine Timer-Datei, z. B. `/etc/systemd/system/update-system.timer` mit folgendem Inhalt:
+
+```ini
+[Unit]
+Description=Führt alle 6 Tage um 4 Uhr nachts die automatischen System-Updates durch
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+Persistent=true
+Unit=update-system.service
+
+# Wiederholung alle 6 Tage
+Unit=update-system.service
+OnActiveSec=6d
+
+[Install]
+WantedBy=timers.target
+```
+
+## 4. Aktiviere und starte den Timer
+
+Aktiviere und starte den Timer mit den folgenden Befehlen:
+
+```bash
+sudo systemctl enable update-system.timer
+sudo systemctl start update-system.timer
+```
+
+## 5. Überprüfe den Status des Timers
+
+Du kannst den Status des Timers überprüfen, um sicherzustellen, dass alles korrekt eingerichtet ist:
+
+```bash
+systemctl list-timers --all
+```
+
+---
+
+Diese Schritte sorgen dafür, dass dein Debian-System alle 6 Tage um 4 Uhr nachts aktualisiert wird, anschließend `apt autoremove` ausgeführt wird und das System neu gestartet wird.

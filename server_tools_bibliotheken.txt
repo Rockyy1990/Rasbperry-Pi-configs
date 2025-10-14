@@ -1,0 +1,110 @@
+﻿
+====================
+
+Hier eine strukturierte, praxistaugliche Liste der besten Server-Tools und Bibliotheken für einen Raspberry Pi (Debian/basierte Distributionen).  Allgemeine Server (Web, Dateien, Datenbanken, Medien, Automatisierung, Überwachung). Kurze Empfehlungen + Zweck und Installationshinweis.
+
+Server-Basis
+- **ssh (OpenSSH)** — Remote-Zugriff.
+  - Installation: sudo apt install openssh-server
+- **ufw** — Einfache Firewall.
+  - Installation: sudo apt install ufw
+  - Schnell: sudo ufw allow ssh; sudo ufw enable
+- **fail2ban** — Schutz gegen Brute-Force.
+  - Installation: sudo apt install fail2ban
+
+Web / HTTP / Reverse Proxy
+- **nginx** — Leichter, performanter Webserver / Reverse-Proxy.
+  - Installation: sudo apt install nginx
+- **Apache2** — Voll ausgestatteter Webserver, viele Module.
+  - Installation: sudo apt install apache2
+- **Caddy** — Einfaches HTTPS (Let’s Encrypt) out-of-the-box.
+  - Installation: Download Binary oder apt-Repos von Caddy
+- **Certbot** — Let’s Encrypt TLS-Zertifikate (falls nicht Caddy).
+  - Installation: sudo apt install certbot python3-certbot-nginx
+
+Datenbanken
+- **SQLite** — Leichtgewichtig, ideal lokal/kleinere Projekte.
+  - Installation: sqlite3 (oft vorinstalliert)
+- **MariaDB / MySQL** — Relationale DB für größere Anwendungen.
+  - Installation: sudo apt install mariadb-server
+- **PostgreSQL** — Fortgeschrittene relationale DB, empfehlenswert bei komplexen Anforderungen.
+  - Installation: sudo apt install postgresql
+
+Programmiersprachen & Laufzeit
+- **Python 3** + pip — Skripte, Web-Apps (Flask, Django).
+  - Installation: sudo apt install python3 python3-pip
+- **Node.js / npm** — Webservices, Echtzeit, viele Tools.
+  - Installation: NodeSource oder apt (für neuere Versionen NodeSource-Repo)
+- **Go** — Statische Binaries, ideal für effiziente Server-Tools.
+  - Installation: sudo apt install golang
+- **Rust (cargo)** — Hochperformante Dienste, Web-Tools.
+  - Installation: rustup (empfohlen)
+
+Web-Frameworks & Apps
+- **Flask / FastAPI (Python)** — leichte bis performante APIs.
+  - pip install flask fastapi uvicorn
+- **Django** — Vollständiges Webframework mit Admin-Interface.
+  - pip install django
+- **Express (Node.js)** — Minimalistisches Webframework.
+  - npm install express
+
+Container & Virtualisierung
+- **Docker** — Containerized Services (empfohlen).
+  - Installation: offizielles Docker-Install-Skript
+- **Podman** — Rootless Alternative zu Docker.
+  - Installation: sudo apt install podman
+- **docker-compose** / **docker compose** — Mehrcontainer-Orchestrierung.
+  - Installation: sudo apt install docker-compose-plugin
+
+Datei- und Medienserver
+- **Samba** — SMB/CIFS für Windows-Freigaben.
+  - Installation: sudo apt install samba
+- **NFS** — Linux-Dateifreigabe.
+  - Installation: sudo apt install nfs-kernel-server
+- **Syncthing** — Dezentrale Datei-Synchronisation.
+  - Installation: apt via Repo oder Syncthing-Website
+- **Plex / Jellyfin** — Medienserver (Jellyfin: Open Source, leicht zu hosten).
+  - Installation: Paket-Repos von Plex/Jellyfin
+
+Backup & Speicherung
+- **rsync** — Datei-Backup/Synchronisation.
+  - Installation: sudo apt install rsync
+- **borgbackup** — Deduplizierendes, verschlüsseltes Backup.
+  - Installation: sudo apt install borgbackup
+- **duplicity** — Verschlüsselte, inkrementelle Backups.
+
+Monitoring & Logging
+- **Prometheus + node_exporter** — Metriken sammeln.
+- **Grafana** — Dashboard-Visualisierung.
+- **Netdata** — Echtzeit-Systemüberwachung, sehr leicht zu installieren.
+  - Installation: one-line Install-Skript
+- **Logrotate** / **rsyslog** — Log-Management.
+
+Automation / Configuration Management
+- **Ansible** — Agentless Konfigurationsverwaltung.
+  - Installation: sudo apt install ansible
+- **systemd** — Dienste / Timer (bereits auf Debian; erstelle systemd-Units).
+
+Reverse-Proxy + App-Hosting Stack (empfohlenes Setup)
+- nginx (Reverse proxy) + Certbot (TLS) oder Caddy
+- Docker für App-Isolation
+- docker-compose für einfache Multi-Container-Stacks
+
+Security-harteing
+- **Let's Encrypt (Certbot)** für TLS
+- **ufw**, **fail2ban**
+- Regelmäßige Updates: sudo apt update && sudo apt upgrade -y
+- Root-Login per SSH deaktivieren, SSH-Schlüssel verwenden
+
+Bibliotheken/Utilities nützlich für Entwicklung
+- **libssl-dev**, **build-essential**, **python3-venv**
+  - sudo apt install build-essential libssl-dev python3-venv
+- **git** — Versionskontrolle.
+  - sudo apt install git
+
+Empfohlene Kombinationen (je nach Zweck)
+- Kleiner Webserver/API: nginx + gunicorn (Django) oder uvicorn (FastAPI) + PostgreSQL oder SQLite
+- Heim-Media/Streaming: Jellyfin + Samba/NFS + external storage
+- Home Automation: Home Assistant (Docker) oder native auf Python
+- File sync/backup: Syncthing + borgbackup (für Backups)
+

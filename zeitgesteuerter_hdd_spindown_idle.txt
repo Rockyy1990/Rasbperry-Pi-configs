@@ -1,0 +1,170 @@
+﻿
+====================
+
+Hier ist eine schritt‑für‑Schritt‑Anleitung (auf Deutsch) — Ziel: Festplatte (HDD) jeden Tag von 00:00–10:00 in Standby bringen und während dieser Zeit verhindern, dass sie aufwacht. Annahmen: Raspberry Pi mit Raspberry Pi OS (Linux), die HDD hängt per USB an, wird als /dev/sdX erkannt, und hdparm ist installierbar.
+
+Wichtig: Manche USB→SATA‑Bridges oder USB‑Chips unterstützen kein zuverlässiges Spindown/Standby oder ignorieren Wake‑Commands. Bei Problemen ggf. USB‑Bridge‑Spezifikation prüfen.
+
+1) Pakete installieren
+- Installiere hdparm und smartmontools (optional):
+  ```
+  sudo apt update
+  sudo apt install hdparm smartmontools
+  ```
+
+2) Identifiziere die HDD
+- Finde Geräteschnittstelle (z. B. /dev/sda):
+  ```
+  lsblk
+  sudo hdparm -I /dev/sda
+  ```
+- Notiere das Gerät (z. B. /dev/sda). Ersetze in folgenden Befehlen entsprechend.
+
+3) Test: manuelles Standby und Wecken prüfen
+- Sofort in Standby schicken:
+  ```
+  sudo hdparm -y /dev/sda
+  ```
+  (Drive geht in Standby; Laufwerk stoppt. Um es zu wecken, irgendeine I/O‑Anfrage wie `sudo ls /dev/sda` oder `sudo hdparm -I /dev/sda` sendet meist ein Wake.)
+- Falls hdparm nicht funktioniert (USB‑Bridge blockiert), ggf. `udisksctl power-off -b /dev/sda` testen (Achtung: trennt ggf. Verbindung).
+
+4) Verhindern, dass Prozesse die HDD wecken
+- Hauptursachen für Wecken: automatisches Mount, cronjobs, udev, logrotate, smartd, mlocate/updatedb, AV‑Scans, Systemd‑Services.
+- Vorgehen (automatisch, zeitgesteuert): 1) unmount / remount read‑only or unmount 2) verhindern, dass Services zugreifen 3) setzen hdparm Standby.
+
+4a) Unmount vor Standby (empfohlen)
+- Wenn die Partitionen nicht gebraucht werden: unmount sie vor 00:00:
+  ```
+  sudo umount /dev/sda1
+  ```
+  Wenn swap auf der HDD liegt, zuerst swapoff:
+  ```
+  sudo swapoff /dev/sdX2
+  ```
+- Optional: entfernen aus /etc/fstab oder ergänzen mit noauto, damit System beim Boot nicht automatisch mountet.
+
+4b) Stoppen/Maskieren störender Dienste
+- Beispiele (anpassen wenn vorhanden):
+  ```
+  sudo systemctl stop smartmontools
+  sudo systemctl disable --now mlocate
+  sudo systemctl stop cron
+  ```
+  (Nicht alle Dienste stoppen — nur jene, die HDD verwenden.)
+
+5) Systemd Timer + Service erstellen (automatisch täglich 00:00 Standby setzen; um 10:00 wieder normale Betriebszustand)
+- Erstelle ein Script, das unmountet, Dienste stoppt und hdparm Standby setzt.
+
+Erstelle /usr/local/sbin/hdd-standby-schedule.sh:
+```
+#!/bin/bash
+DEVICE="/dev/sda"
+# unmount partitions
+for p in $(lsblk -ln -o NAME,MOUNTPOINT | awk -v dev="$(basename $DEVICE)" '$1 ~ dev { if($2!="") print "/dev/"$1 }'); do
+  umount "$p" 2>/dev/null || true
+done
+# stop services that may touch disk
+systemctl stop smartmontools mlocate cron 2>/dev/null || true
+# set standby
+hdparm -y $DEVICE
+exit 0
+```
+Mache ausführbar:
+```
+sudo chmod +x /usr/local/sbin/hdd-standby-schedule.sh
+```
+
+Erstelle /usr/local/sbin/hdd-resume-schedule.sh (um 10:00 Dienste starten; optional remount):
+```
+#!/bin/bash
+DEVICE="/dev/sda"
+# wake by sending identify
+hdparm -I $DEVICE >/dev/null 2>&1 || true
+# start services
+systemctl start smartmontools mlocate cron 2>/dev/null || true
+# optional: remount (nur wenn fstab hat noauto entfernen oder mounten gewünscht)
+# mount /dev/sda1 /mnt/mydisk
+exit 0
+```
+Mache ausführbar.
+
+5b) Systemd Timer/Service Dateien
+- Service für Standby: /etc/systemd/system/hdd-standby.service
+```
+[Unit]
+Description=Set HDD to standby
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/hdd-standby-schedule.sh
+```
+- Timer: /etc/systemd/system/hdd-standby.timer
+```
+[Unit]
+Description=Daily HDD standby timer
+
+[Timer]
+OnCalendar=*-*-* 00:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+- Service für Resume: /etc/systemd/system/hdd-resume.service
+```
+[Unit]
+Description=Wake HDD and restart services
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/hdd-resume-schedule.sh
+```
+- Timer: /etc/systemd/system/hdd-resume.timer
+```
+[Unit]
+Description=Daily HDD resume timer
+
+[Timer]
+OnCalendar=*-*-* 10:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+6) Aktivieren der Timer
+```
+sudo systemctl daemon-reload
+sudo systemctl enable --now hdd-standby.timer
+sudo systemctl enable --now hdd-resume.timer
+```
+
+7) Zusätzliche Maßnahmen, um Aufwachen während 00:00–10:00 zu verhindern
+- Stelle sicher, dass keine automatischen Cronjobs laufen, die auf die HDD zugreifen (z. B. logrotate, updatedb). Prüfe /etc/cron.* und systemd timers.
+- Konfiguriere smartd (smartmontools) so, dass es keine Tests in dieser Zeit ausführt (oder stoppe smartd während Standby wie oben).
+- Deaktiviere automatische Mounts in /etc/fstab (nutze noauto oder systemd.automount mit Timeouts) oder entferne Einträge, wenn Platte nicht permanent nötig.
+- Für Samba/NFS: stoppe Dienste vor Standby.
+- Für Docker/containers: sicherstellen, dass keine Container Volumes auf die HDD gemountet haben.
+
+8) Falls unmount nicht möglich (Platte muss gemountet bleiben)
+- Manche Dateisysteme/Anwendungen greifen ständig zu. Dann bleibt nur hdparm -S (spindown Timeout) und hartes hdparm -y; manche USB‑Bridges ignorieren. Beispiel hdparm Schlaf mit Timeout (Einheiten=30 Sekunden):
+  ```
+  sudo hdparm -S 120 /dev/sda   # 120*30s = 3600s = 1 Stunde
+  ```
+  Aber das ist kein garantierter Schutz vor externem Wake.
+
+9) Testen und Überwachen
+- Testlauf manuell: führe standby script und versuche während 00:00–10:00 Zugriff (z. B. ls /mount/…) — Platte sollte ≈nicht erwachen (abhängig von USB‑Bridge).
+- Logs prüfen:
+  ```
+  journalctl -u hdd-standby.service -b
+  journalctl -u hdd-resume.service -b
+  ```
+
+10) Troubleshooting kurz
+- Platte wacht trotzdem: häufige Ursachen:
+  - USB‑SATA Bridge ignoriert spindown
+  - Systemdienste/Kernel‑I/O (z. B. udisks, systemd‑udevd) greifen zu
+  - Automount durch desktop Umgebungen
+- Lösung: unmount zuverlässig, stoppe Dienste, oder physisch Strom abschalten (z. B. per schaltbare USB‑Hub/Relais) — letztere ist die zuverlässigste Methode, wenn Spindown nicht durchsetzbar ist.
+
