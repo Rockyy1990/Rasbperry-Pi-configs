@@ -1,0 +1,152 @@
+﻿
+## Grafana – Hauptfunktionen
+
+- **Visualisierung von Zeitreihendaten**  
+  Grafana unterstützt Diagramme, Heatmaps, Tabellen, Gauge‑Widgets und mehr, um Messwerte aus verschiedensten Quellen anschaulich darzustellen.
+
+- **Anbindung an zahlreiche Datenquellen**  
+  Integrierte Plugins für Prometheus, InfluxDB, Graphite, Elasticsearch, MySQL, PostgreSQL, Loki (Logs) und viele weitere Systeme.
+
+- **Dashboard‑Erstellung & -Freigabe**  
+  Interaktive Dashboards können per Drag‑&‑Drop gebaut, versioniert und über Links, Snapshots oder eingebettete iFrames mit anderen geteilt werden.
+
+- **Alerting**  
+  Definieren von Schwellenwerten, Benachrichtigungen per E‑Mail, Slack, Teams, PagerDuty, Webhooks usw. und automatisches Auslösen von Aktionen bei Regelverletzungen.
+
+- **Templating & Variablen**  
+  Dynamische Dashboards, bei denen Nutzer Parameter (z. B. Host‑Name, Zeitraum) auswählen können, um dieselbe Ansicht für unterschiedliche Daten zu nutzen.
+
+- **Exploration & Ad‑hoc‑Abfragen**  
+  Schnellere Fehlersuche durch interaktive Abfrage‑Editoren, die sofortige Visualisierung von Rohdaten ermöglichen.
+
+- **Plug‑in‑Ökosystem**  
+  Erweiterungen für neue Visualisierungen, Datenquellen, Panels und Authentifizierungsmethoden (OAuth, LDAP, SAML).
+
+- **Benutzer‑ und Rollen‑Management**  
+  Granulare Berechtigungen (Viewer, Editor, Admin) für Teams und einzelne Nutzer.
+
+- **Export/Import**  
+  Dashboards können als JSON‑Dateien exportiert und in andere Grafana‑Instanzen importiert werden, was den Transfer zwischen Umgebungen erleichtert.
+
+- **Performance‑Optimierung**  
+  Caching, Daten‑Downsampling und asynchrone Abfragen reduzieren die Belastung von Datenquellen und verbessern die Ladezeiten.
+
+====================
+
+Wie richte ich grafana auf einem raspberry pi os ein. Wie binde ich zum beispiel adguard home ein oder protokoliere den ganzen netzwer verkehr.
+
+
+3. **Grafana installieren & starten**  
+   ```bash
+   sudo apt install -y grafana
+   sudo systemctl enable --now grafana-server
+   ```
+
+4. **Zugriff**  
+   Öffne im Browser `http://<Pi‑IP>:3000`.  
+   Standard‑Login: **admin / admin** (bei erster Anmeldung wird ein neues Passwort verlangt).
+
+---
+
+## AdGuard Home in Grafana einbinden  
+
+AdGuard Home liefert Metriken über **Prometheus**.  
+
+1. **Prometheus‑Export für AdGuard aktivieren**  
+   In der `AdGuardHome.yaml` (oder über das Web‑UI → Settings → Prometheus) Folgendes setzen:  
+
+   ```yaml
+   prometheus:
+     enable: true
+     listen_addr: 0.0.0.0:9617   # Port kann frei gewählt werden
+   ```
+
+2. **Prometheus‑Server auf dem Pi installieren**  
+
+   ```bash
+   sudo apt install -y prometheus
+   ```
+
+   In `/etc/prometheus/prometheus.yml` den AdGuard‑Job hinzufügen:
+
+   ```yaml
+   scrape_configs:
+     - job_name: 'adguard'
+       static_configs:
+         - targets: ['localhost:9617']
+   ```
+
+   Prometheus neu starten: `sudo systemctl restart prometheus`.
+
+3. **Grafana‑Datenquelle hinzufügen**  
+   * Grafana UI → **Configuration → Data Sources → Add data source**  
+   * Typ: **Prometheus**  
+   * URL: `http://localhost:9090` (Standard‑Port von Prometheus)  
+   * **Save & Test** – sollte „Data source is working“ anzeigen.
+
+4. **Dashboard importieren**  
+   * Dashboard‑ID **11074** (AdGuard Home) aus der Grafana‑Dashboard‑Bibliothek.  
+   * Grafana UI → **Create → Import**, ID eingeben, Datenquelle auswählen.
+
+---
+
+## Netzwerkverkehr protokollieren  
+
+### 1. Basis‑Metriken mit **node_exporter**  
+
+```bash
+wget https://github.com/prometheus/node_exporter/releases/download/v1.8.1/node_exporter-1.8.1.linux-armv7.tar.gz
+tar xzf node_exporter-*.tar.gz
+sudo cp node_exporter-*/node_exporter /usr/local/bin/
+sudo useradd -rs /bin/false node_exporter
+sudo tee /etc/systemd/system/node_exporter.service > /dev/null <<EOF
+[Unit]
+Description=Prometheus Node Exporter
+After=network.target
+
+[Service]
+User=node_exporter
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=default.target
+EOF
+sudo systemctl daemon-reload
+sudo systemctl enable --now node_exporter
+```
+
+Füge in `prometheus.yml` einen Job `node` mit `targets: ['localhost:9100']` hinzu.
+
+### 2. Detaillierte Traffic‑Analyse mit **ntopng** (optional)  
+
+```bash
+sudo apt install -y ntopng
+sudo systemctl enable --now ntopng
+```
+
+* ntopng stellt ebenfalls Prometheus‑Metriken bereit (`/api/v1/metrics`).  
+* Ergänze in `prometheus.yml` einen Job für ntopng (`targets: ['localhost:3001']`).  
+
+### 3. Grafana‑Dashboards  
+
+| Zweck                     | Empfohlenes Dashboard (ID) | Datenquelle |
+|---------------------------|----------------------------|-------------|
+| System‑Ressourcen (CPU, RAM, Disk) | 1860 (Node Exporter Full) | Prometheus |
+| AdGuard‑Statistiken       | 11074                      | Prometheus |
+| Netzwerk‑Traffic (ntopng) | 10280 (ntopng Overview)   | Prometheus |
+
+Importiere die gewünschten Dashboards wie bei AdGuard beschrieben.
+
+---
+
+## Kurz‑Checkliste  
+
+- **Grafana** läuft auf Port 3000.  
+- **Prometheus** sammelt:  
+  - AdGuard Home (`localhost:9617`)  
+  - Node‑Exporter (`localhost:9100`)  
+  - Optional ntopng (`localhost:3001`).  
+- In Grafana die Prometheus‑Datenquelle anlegen.  
+- Passende Dashboards importieren und ggf. anpassen (Zeitbereich, Panels).  
+
+Damit hast du ein vollständiges Monitoring‑Setup auf dem Raspberry Pi, das sowohl AdGuard Home als auch den allgemeinen Netzwerkverkehr visualisiert.

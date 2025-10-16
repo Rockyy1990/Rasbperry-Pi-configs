@@ -1,0 +1,141 @@
+﻿
+====================
+
+## Raspberry OS als Netzwerk‑Firewall mit UFW einrichten
+
+---
+
+### 1. Vorbereitung
+1. **Raspberry Pi mit Raspberry OS installieren**  
+   - Nutze das offizielle Raspberry Pi Imager, wähle *Raspberry OS Lite* (keine Desktop‑Umgebung, spart Ressourcen).  
+2. **Netzwerk‑Layout planen**  
+   - **eth0** → WAN (Internet‑Anschluss)  
+   - **eth1** → LAN (internes Netzwerk, z. B. Switch/Access‑Points)  
+   - Optional: WLAN‑Interface als zweites LAN‑Segment.
+
+> **Hinweis:** Für ein reines Firewall‑Setup empfiehlt sich ein dedizierter Ethernet‑Adapter für jedes Segment. Der integrierte LAN‑Port kann als WAN dienen, ein USB‑Ethernet‑Adapter als LAN.
+
+3. **IP‑Adressen festlegen**  
+   ```bash
+   # Beispiel: WAN (DHCP) – LAN (statisch)
+   sudo dhcpcd.conf
+   ```
+   ```conf
+   interface eth0
+   # DHCP (vom ISP)
+
+   interface eth1
+   static ip_address=192.168.10.1/24
+   static routers=192.168.10.1
+   static domain_name_servers=8.8.8.8 8.8.4.4
+   ```
+
+4. **IP‑Forwarding aktivieren**  
+   ```bash
+   sudo sysctl -w net.ipv4.ip_forward=1
+   sudo sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+   ```
+
+---
+
+### 2. UFW (Uncomplicated Firewall) installieren & Grundkonfiguration
+```bash
+sudo apt update
+sudo apt install ufw
+```
+
+#### Grundregeln
+| Richtung | Aktion | Quelle/Ziel | Port/Protokoll | Zweck |
+|----------|--------|-------------|----------------|-------|
+| Eingehend (WAN) | **deny** | überall | *alle* | Standard‑Blockade |
+| Weitergeleitet (WAN→LAN) | **allow** | LAN‑Netz (192.168.10.0/24) | *alle* | Internen Zugriff erlauben |
+| Eingehend (LAN) | **allow** | LAN‑Netz | *alle* | Verwaltung von LAN aus |
+| Ausgehend | **allow** | überall | *alle* | Standard‑Erlaubnis |
+
+```bash
+# Standard‑Policy
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+# LAN‑Zugriff (Verwaltung)
+sudo ufw allow in on eth1 from 192.168.10.0/24
+
+# NAT/Weiterleitung (Masquerading) wird über iptables erledigt, siehe unten
+```
+
+---
+
+### 3. NAT (Masquerading) einrichten
+UFW kann NAT über *before.rules* konfigurieren.
+
+```bash
+sudo nano /etc/ufw/before.rules
+```
+
+Füge am Anfang (nach den Header‑Kommentaren) Folgendes ein:
+
+```conf
+*nat
+:POSTROUTING ACCEPT [0:0]
+
+# Masquerade für das LAN‑Interface (eth1) → WAN (eth0)
+-A POSTROUTING -s 192.168.10.0/24 -o eth0 -j MASQUERADE
+
+COMMIT
+```
+
+Speichere und schließe die Datei, dann **UFW neu laden**:
+
+```bash
+sudo ufw disable
+sudo ufw enable
+```
+
+---
+
+### 4. Weiterleitungsregeln (optional)
+Falls du bestimmte Dienste (z. B. Web‑Server) im LAN nach außen freigeben willst:
+
+```bash
+# Beispiel: HTTP (Port 80) aus dem Internet ins interne Gerät 192.168.10.10
+sudo ufw route allow in on eth0 to 192.168.10.10 port 80 proto tcp
+```
+
+Für mehrere Ports oder Protokolle wiederhole den Befehl bzw. nutze `ufw`‑Profile.
+
+---
+
+### 5. Testen & Monitoring
+1. **Status prüfen**  
+   ```bash
+   sudo ufw status verbose
+   ```
+2. **Verbindung vom LAN prüfen**  
+   - Ping das Internet (`ping 8.8.8.8`).  
+   - Prüfe NAT: Auf einem LAN‑Client `curl ifconfig.me` sollte deine öffentliche IP zeigen.  
+3. **Log‑Ausgabe aktivieren** (falls noch nicht):  
+   ```bash
+   sudo ufw logging on
+   sudo tail -f /var/log/ufw.log
+   ```
+
+---
+
+### 6. Persistente Updates (falls nötig)
+- **UFW‑Regeln** bleiben nach Neustart erhalten.  
+- **IP‑Forwarding** ist in `/etc/sysctl.conf` dauerhaft.  
+- **iptables‑NAT** wird über die *before.rules* von UFW geladen, also ebenfalls persistent.
+
+---
+
+#### Schnell‑Checkliste
+
+- [ ] Raspberry OS Lite installiert, SSH aktiviert  
+- [ ] Zwei Netzwerk‑Interfaces (WAN = eth0, LAN = eth1) konfiguriert  
+- [ ] IP‑Forwarding aktiviert (`net.ipv4.ip_forward=1`)  
+- [ ] UFW installiert, Standard‑Policies gesetzt  
+- [ ] NAT‑Regel in `/etc/ufw/before.rules` eingefügt  
+- [ ] UFW neu gestartet, Status geprüft  
+- [ ] Optional: Port‑Forwarding‑Regeln für gewünschte Dienste  
+
+Damit fungiert dein Raspberry Pi als kompakte, leicht zu wartende Netzwerk‑Firewall. Viel Erfolg!

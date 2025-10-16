@@ -1,0 +1,284 @@
+﻿
+====================
+
+## Enabling USB autosuspend for a UAS‑connected HDD on a Raspberry Pi
+
+The Raspberry Pi’s Linux kernel supports USB autosuspend, but external drives that use the **UAS** (USB Attached SCSI) driver often need a few extra tweaks to stay reliable when the system tries to suspend them.
+
+### 1. Verify the drive is using the UAS driver
+```bash
+lsblk -o NAME,TRAN,TYPE,MOUNTPOINT
+```
+Look for `TRAN` = `usb` and `TYPE` = `disk`. Then confirm the driver:
+
+```bash
+sudo dmesg | grep -i uas
+```
+You should see lines like `uas: ...` indicating the UAS driver is attached.
+
+### 2. Install and configure `usbutils` (optional but handy)
+```bash
+sudo apt-get update
+sudo apt-get install usbutils
+```
+`usbutils` provides `lsusb`, which you’ll use to identify the device’s bus and address.
+
+```bash
+lsusb -t
+```
+Typical output for a UAS HDD:
+
+```
+/:  Bus 01.Port 1: Dev 2, Class=Mass Storage, Driver=uas, 5000M
+```
+
+### 3. Enable global USB autosuspend (if not already)
+
+Edit `/etc/default/grub` and add the kernel parameter `usbcore.autosuspend=1` (the value is the timeout in seconds; `1` s is a safe starting point).
+
+```bash
+sudo nano /etc/default/grub
+```
+
+Find the line starting with `GRUB_CMDLINE_LINUX_DEFAULT` and modify it, e.g.:
+
+```
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash usbcore.autosuspend=1"
+```
+
+Update GRUB and reboot:
+
+```bash
+sudo update-grub
+sudo reboot
+```
+
+### 4. Create a per‑device autosuspend rule
+
+Because some UAS drives misbehave with aggressive autosuspend, it’s best to set a custom timeout (or disable it) for that specific device.
+
+1. Identify the device’s **vendor** and **product** IDs:
+
+   ```bash
+   lsusb | grep -i "mass storage"
+   ```
+
+   Example output:
+
+   ```
+   Bus 001 Device 002: ID 1234:5678 Seagate Technology External HDD
+   ```
+
+   Here `1234` is the vendor ID and `5678` the product ID.
+
+2. Add a udev rule:
+
+   ```bash
+   sudo nano /etc/udev/rules.d/99-usb-autosuspend.rules
+   ```
+
+   Insert the following (replace the IDs with yours; `0` disables autosuspend, `1` s sets a 1‑second timeout):
+
+   ```udev
+   ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1234", ATTR{idProduct}=="5678", TEST=="power/control", ATTR{power/control}="auto", ATTR{power/autosuspend}="1"
+   ```
+
+   To **disable** autosuspend for the drive (often the most reliable option):
+
+   ```udev
+   ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1234", ATTR{idProduct}=="5678", ATTR{power/control}="on"
+   ```
+
+3. Reload udev rules and trigger them:
+
+   ```bash
+   sudo udevadm control --reload
+   sudo udevadm trigger
+   ```
+
+### 5. Verify the setting
+
+```bash
+cat /sys/bus/usb/devices/1-2/power/control
+cat /sys/bus/usb/devices/1-2/power/autosuspend
+```
+
+Replace `1-2` with the bus‑address of your HDD (found via `lsusb -t`). The first file should show `auto` (or `on` if you disabled autosuspend), and the second file should show the timeout you set (`1` for one second).
+
+### 6. Test the suspend behavior
+
+1. **Force a suspend** of the USB bus:
+
+   ```bash
+   echo auto > /sys/bus/usb/devices/1-2/power/control
+   ```
+
+2. **Monitor** the drive’s activity with `iostat` or `smartctl`:
+
+   ```bash
+   sudo apt-get install sysstat smartmontools
+   iostat -x 1
+   ```
+
+   After the timeout expires, the drive should spin down (you’ll hear the usual HDD spin‑down sound). Access the drive again (e.g., `ls /mnt/hdd`) and it should spin back up without errors.
+
+### 7. Optional: Use `hdparm` to control spin‑down independently
+
+If you only need the drive to spin down after inactivity, you can let the kernel handle USB autosuspend and let `hdparm` manage the HDD’s own power state:
+
+```bash
+sudo hdparm -S 120 /dev/sda   # spin down after 10 minutes (120 × 5 s)
+```
+
+Combine this with the USB autosuspend rule set to `auto` (or a short timeout) for the best power‑saving result.
+
+---
+
+**Summary checklist**
+
+| Step | Action |
+|------|--------|
+| Verify UAS driver | `lsblk`, `dmesg` |
+| Enable global autosuspend | `GRUB_CMDLINE_LINUX_DEFAULT="... usbcore.autosuspend=1"` |
+| Identify vendor/product IDs | `lsusb` |
+| Add udev rule | `/etc/udev/rules.d/99-usb-autosuspend.rules` |
+| Reload udev | `udevadm control --reload && udevadm trigger` |
+| Confirm settings | Check `/sys/bus/usb/devices/.../power/*` |
+| Test spin‑down | Use `iostat`/`smartctl` and access the drive |
+
+With these steps the Raspberry Pi will correctly suspend a UAS‑connected HDD, saving power while keeping the drive reliable.
+
+--------------------
+
+## Autosuspend a UAS‑connected drive on Raspberry OS without touching GRUB
+
+You can control USB autosuspend at runtime (or permanently) using **sysfs** and **udev** rules—no kernel‑command‑line changes are required.
+
+### 1. Enable the kernel‑wide autosuspend feature (once)
+
+The kernel already has the autosuspend subsystem compiled in.  
+All you need is to set the default timeout value, which lives in a sysfs node:
+
+```bash
+# Set a 1‑second global timeout (choose any value you like)
+echo 1 | sudo tee /sys/module/usbcore/parameters/autosuspend
+```
+
+> This change lasts until the next reboot. To make it persistent without GRUB, add the line to `/etc/rc.local` (or a systemd service) so it runs at boot.
+
+#### Example using `/etc/rc.local`
+
+```bash
+sudo nano /etc/rc.local
+```
+
+Add before the final `exit 0` line:
+
+```bash
+#!/bin/sh -e
+echo 1 > /sys/module/usbcore/parameters/autosuspend
+exit 0
+```
+
+Make the file executable:
+
+```bash
+sudo chmod +x /etc/rc.local
+```
+
+### 2. Identify the UAS HDD’s USB device path
+
+```bash
+lsusb -t
+```
+
+Typical output:
+
+```
+/:  Bus 01.Port 1: Dev 2, Class=Mass Storage, Driver=uas, 5000M
+```
+
+Note the **bus‑port** string (`1-2` in the example). You’ll use it in the next steps.
+
+### 3. Per‑device autosuspend via sysfs (temporary)
+
+To test the setting on a single device:
+
+```bash
+# Enable autosuspend for the device
+echo auto | sudo tee /sys/bus/usb/devices/1-2/power/control
+
+# Set the timeout (seconds) – 1 s is a safe start
+echo 1 | sudo tee /sys/bus/usb/devices/1-2/power/autosuspend
+```
+
+Replace `1-2` with your device’s identifier.  
+When you’re done, you can revert:
+
+```bash
+echo on | sudo tee /sys/bus/usb/devices/1-2/power/control
+```
+
+### 4. Make the per‑device setting permanent with a udev rule
+
+Create a rule that applies the same values each time the drive is plugged in.
+
+```bash
+sudo nano /etc/udev/rules.d/99-uas-autosuspend.rules
+```
+
+Add the following (replace `idVendor`/`idProduct` with your drive’s IDs; you can also match by the bus‑port if you prefer):
+
+```udev
+# Example for a Seagate external HDD (vendor 1234, product 5678)
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1234", ATTR{idProduct}=="5678", \
+    ATTR{power/control}="auto", ATTR{power/autosuspend}="1"
+```
+
+If you want to **disable** autosuspend for the drive (sometimes more reliable), set `power/control` to `on` and omit the timeout line:
+
+```udev
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="1234", ATTR{idProduct}=="5678", \
+    ATTR{power/control}="on"
+```
+
+Reload the rules and trigger them:
+
+```bash
+sudo udevadm control --reload
+sudo udevadm trigger
+```
+
+### 5. Verify the rule took effect
+
+```bash
+cat /sys/bus/usb/devices/1-2/power/control
+cat /sys/bus/usb/devices/1-2/power/autosuspend
+```
+
+You should see `auto` (or `on` if you disabled autosuspend) and the timeout you specified.
+
+### 6. Optional: Combine with `hdparm` for HDD spin‑down
+
+If you only need the drive to spin down after inactivity, let the USB bus stay active and let the drive manage its own power state:
+
+```bash
+sudo apt-get install hdparm
+sudo hdparm -S 120 /dev/sda   # spin down after 10 min (120 × 5 s)
+```
+
+You can keep USB autosuspend enabled (short timeout) to cut power to the USB link when the drive is idle, while `hdparm` handles the mechanical spin‑down.
+
+---
+
+### Quick checklist
+
+| Goal | Command / File |
+|------|----------------|
+| Set global autosuspend timeout (no GRUB) | `echo 1 > /sys/module/usbcore/parameters/autosuspend` (add to `/etc/rc.local` for persistence) |
+| Test per‑device autosuspend | `echo auto > /sys/bus/usb/devices/<bus‑port>/power/control`<br>`echo 1 > /sys/bus/usb/devices/<bus‑port>/power/autosuspend` |
+| Permanent per‑device rule | `/etc/udev/rules.d/99-uas-autosuspend.rules` |
+| Verify | `cat /sys/bus/usb/devices/<bus‑port>/power/*` |
+| Optional HDD spin‑down | `hdparm -S 120 /dev/sda` |
+
+With these steps the Raspberry OS will autosuspend a UAS‑connected HDD without any GRUB modifications.

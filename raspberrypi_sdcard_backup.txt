@@ -1,0 +1,54 @@
+﻿
+====================
+
+## Möglichkeiten zur Sicherung einer SD-Karte vom Raspberry Pi
+
+<hr>
+
+### 1. Backup mit `dd` unter Linux
+
+Mit dem `dd`-Befehl kannst du ein Abbild der SD-Karte erstellen.
+
+- **Schritte**:
+  1. Stecke die SD-Karte in deinen Computer.
+  2. Finde den Gerätetyp der SD-Karte (z. B. `/dev/sdb`, dies kann je nach System variieren):
+     ```bash
+     lsblk
+     ```
+  3. Erstelle das Backup:
+     ```bash
+     sudo dd if=/dev/sdX of=backup.img bs=4M
+     ```
+     Ersetze `sdX` durch den tatsächlichen Gerätetyp.
+  4. Warte, bis der Prozess abgeschlossen ist.
+
+### 2. Verwendung von Win32 Disk Imager unter Windows
+
+Für Windows-Nutzer ist Win32 Disk Imager eine benutzerfreundliche Lösung.
+
+- **Schritte**:
+  1. Installiere Win32 Disk Imager.
+  2. Stecke die SD-Karte in deinen Computer.
+  3. Wähle den Laufwerksbuchstaben der SD-Karte und das Ziel für das Backup-Bild.
+  4. Klicke auf „Read“, um ein Abbild zu erstellen.
+
+### 3. Raspberry Pi Imager
+
+Raspberry Pi bietet auch eine eigene Anwendung, um Sicherungen zu erstellen.
+
+- **Schritte**:
+  1. Installiere den Raspberry Pi Imager.
+  2. Stecke die SD-Karte in deinen Computer.
+  3. Wähle „Backup“ und folge den Anweisungen, um die SD-Karte zu sichern.
+
+### 4. Backup mit rsync
+
+Wenn du nur bestimmte Dateien oder Verzeichnisse sichern möchtest, ist `rsync` eine gute Wahl.
+
+- **Schritte**:
+  1. Verbinde dich per SSH mit deinem Raspberry Pi.
+  2. Führe `rsync` aus:
+     ```bash
+     rsync -av --progress /pfad/zum/zu sichernden/verzeichnis /pfad/zur/sicheren/kopie
+     ```
+
