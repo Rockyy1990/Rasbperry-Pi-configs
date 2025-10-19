@@ -58,6 +58,9 @@ ffmpeg -i D:\Sourcefile -vcodec libx264 -crf 20 -tune film -tune fastdecode -pre
 # Convert to x264 vb and 224k 2.0 medium preset and high profile lvl 4
 ffmpeg -i D:\Sourcefile -vcodec libx264 -vb 2400k -vprofile high -level 40 -s 1920x1080 -tune film -tune fastdecode -preset medium -acodec aac -ab 224k -ac 2 -y D:\Output.mp4 
 
+# Convert to x264 crf 23 preset medium with decomb fast
+ffmpeg -i input.mp4 -vf "decomb=mode=fast" -c:v libx264 -crf 23 -preset medium -c:a copy output.mp4
+
 
 :: x265
 
