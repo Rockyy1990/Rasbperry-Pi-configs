@@ -3,10 +3,16 @@
 # FFMPEG Converter
 #
 
-USAGE: ffmpeg [Global_OPTIONS] [SOURCE OPTIONS] -i SOURCEFILE [TARGETFILE OPTIONS] TARGETFILE 
+USAGE: 
+# ffmpeg [Global_OPTIONS] [SOURCE OPTIONS] -i SOURCEFILE [TARGETFILE OPTIONS] TARGETFILE 
+
+# Best crf and Average bitrate:
+# -crf 18 - 23
+# -vb 1800k - 2300k  # Good quality
+# -vb 2400k - 3800k  # High quality
 
 
-## Tipps and tricks
+## FFMPEG Options and tweaks
 
 # Metadata from source file to targetfile
 ffmpeg -i <sourcefile> -map_metadata 0 -movflags use_metadata_tags
@@ -14,15 +20,44 @@ ffmpeg -i <sourcefile> -map_metadata 0 -movflags use_metadata_tags
 # video scale (from 4k to fhd etc)
 ffmpeg -i input.mp4 -vf "scale=1920x1080" output.mp4
 
-# Using AV1 Video codec insteed of x264 or 265
-ffmpeg -i 20230722_135205.mp4 -vcodec libsvtav1 output_libsvtav1.mkv
-
 # Preset superfast is like realtime. You should use that instead of -preset ultrafast. 
 # Ultrafast is far less efficient compression than superfast.
 -preset superfast
 
+# Preset medium and slow (better compression efficiency and improved quality at the expense of encoding time)
+-preset medium , -preset slow 
+
+# Using video denoise
+-vf "hqdn3d"
+
+# Optimizes settings for animated content to maintain color fidelity and detail.
+-tune animation
+
+# Using AV1 Video codec insteed of x264 or 265
+ffmpeg -i 20230722_135205.mp4 -c:v libsvtav1 -b:v 2000k -c:a aac -b:a 224k -strict experimental output.mkv
+
+
+
+::264
 # Better quality with x264 (but a little bit slower encoding speed)
--x264opts fast_pskip=0
+-x264opts fast_pskip=0 , -profile:v high , -level 4.1
+
+# Enables adaptive quantization for better-quality detail retention.
+# Sets the maximum number of B-frames between I/P-frames to improve compression efficiency.
+-x264-params "aq-mode=1:bframes=16"
+
+
+::265
+# Better quality for x265 (Increase rate-distortion optimization for better quality at the same bitrate.)
+--rd 4
+
+# Sets the maximum interval between I-frames to improve compression.
+--keyint 240
+
+# (x265 only) Optimizes encoding for sources with grain for better quality retention.
+-tune grain
+
+
 
 # AAC Variable Bitrate (VBR) (4 and 5 for best quality)
 -acodec aac -vbr 5
@@ -33,6 +68,7 @@ ffmpeg -i 20230722_135205.mp4 -vcodec libsvtav1 output_libsvtav1.mkv
 # A/V Synchro (Automatic)
 -sync -1
 
+
 # Prevents ffmpeg from outputting its copyright notice, build options and library versions
 -hide_banner
 
@@ -41,6 +77,9 @@ ffmpeg -i 20230722_135205.mp4 -vcodec libsvtav1 output_libsvtav1.mkv
 
 # Disables printing of encoding progress/statistics
 -nostats
+
+# Only pv output (No warnings etc)
+-v quiet
 
 
 
@@ -70,6 +109,20 @@ ffmpeg -i D:\input -c:v libx265 -crf 22 -tune film -tune fastdecode -preset medi
 # Convert to x265 vb and aac 224k 2.0 medium preset
 ffmpeg -i D:\input -c:v libx265 -vb 2400k -tune film -tune fastdecode -preset medium -c:a aac -b:a 224k -ac 2 D:\output.mp4
 
+# Convert webm to x265
+ffmpeg -i input.webm -c:v libx265 -b:v 2200k -preset medium -c:a aac -b:a 224k output.mp4
+
+
+:: AVI
+
+# Convert MP4 into an AVI File (Same quality)
+ffmpeg -i filename.mp4 -vcodec copy -acodec copy filename.avi
+
+# Convert MKV into AVI High Quality
+ffmpeg -i input.mkv -codec:v libx264 -preset slow -crf 18 -codec:a copy output.avi
+
+
+
 
 - Convert into Audio
 
@@ -79,10 +132,21 @@ ffmpeg -i input.wav -c:a aac -b:a 256k output.aac
 # recoding
 ffmpeg -i input-video.mp4 -acodec copy output.mp3
 
+# Convert into mp3 with using presets (high and extreme for best quality)
+ffmpeg -i input.wav lame --preset extreme  output.mp3
 
 # simple command to extract audio from a video file
 ffmpeg -i input-video.mp4 output-audio.mp3
 
+
+# Convert into Flac (level 5 is recommended value)
+ffmpeg -i input.wav -compression_level 5 output.flac
+
+# Convert into Opus
+ffmpeg -i input.wav opusenc --bitrate 192 output.opus
+
+# Convert into OGG Vorbis (with quality settings)
+ffmpeg -i input.wav oggenc -q5 output.ogg
 
 
 
