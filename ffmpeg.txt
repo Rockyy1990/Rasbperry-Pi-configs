@@ -4,12 +4,61 @@
 #
 
 USAGE: 
-# ffmpeg [Global_OPTIONS] [SOURCE OPTIONS] -i SOURCEFILE [TARGETFILE OPTIONS] TARGETFILE 
+# windows (powershell, cmd) 
+ffmpeg [Global_OPTIONS] [SOURCE OPTIONS] -i SOURCEFILE [TARGETFILE OPTIONS] TARGETFILE 
+
+# linux konsole
+ffmpeg [Global_OPTIONS] [SOURCE OPTIONS] -i SOURCEFILE [TARGETFILE OPTIONS] TARGETFILE    
+
+# run ffmpeg with higher priority (more cpu time) 
+# (realtime priority is not recommended because system instability)
+# start /HIGH ffmpeg -i         
+# start /abovenormal ffmpeg -i
+# linux: nice -n -10 ffmpeg -i 
+
+!! Issues with Space in Filenames in FFmpeg !!
+# Use Quotation Marks ("")
+# ffmpeg -i "My Audio File.mp3" -c:a libopus output.opus
+
+
+### Example to use ffmpeg in a script (cmd)
+@echo off
+echo Welcome to the FFmpeg conversion script!
+
+:: Ask user for input file
+set /p inputFile="Please enter the full path of the input file (e.g., C:\path\to\input.mp4): "
+
+:: Ask user for output file
+set /p outputFile="Please enter the full path of the output file (e.g., C:\path\to\output.mkv): "
+
+:: Execute the FFmpeg command
+ffmpeg -i "%inputFile%" -c:v copy -c:a copy "%outputFile%"
+
+echo Conversion completed!
+pause
+###
+
 
 # Best crf and Average bitrate:
-# -crf 18 - 23
-# -vb 1800k - 2300k  # Good quality
-# -vb 2400k - 3800k  # High quality
+# -crf 18 - 24 (x265: -crf 20 - 26)
+# -vb 1700k - 2300k  # Good quality
+# -vb 2400k - 3600k  # High quality
+# -vb 3700k - 4600k  # Very high quality (high file size)
+
+# Best settings for average bitrate. 
+# ( -maxrate Sets the maxium allowed bitrate. Helps to avoid bitrate spikes)
+# ( -bufsize Defines the buffer size for video encoding, used with -maxrate. Set -bufsize to 2x -b:v)
+ffmpeg -i input.mp4 -b:v 1500k -maxrate 2000k -bufsize 3000k -b:a 192k -preset slow output.mp4
+
+## Example for calculating a fix video filesize:
+If you want a 10 MB file for a video that is 50 seconds long:
+
+     Calculate the bitrate:
+  1. File Size = 10 MB = 10,000 KB      2. File Size = 2400 = 2400 x 1024 = 2457.600 KB
+     Duration = 50 seconds                 Duration = 1h (3600 seconds), 30min = (1800 seconds) = 5400 seconds
+
+    Bitrate=10000×8/50​= 1600 kbps         Bitrate=2.457.600×8/5400​≈ 3642,67 kbps
+
 
 
 ## FFMPEG Options and tweaks
@@ -36,11 +85,21 @@ ffmpeg -i input.mp4 -vf "scale=1920x1080" output.mp4
 # Using AV1 Video codec insteed of x264 or 265
 ffmpeg -i 20230722_135205.mp4 -c:v libsvtav1 -b:v 2000k -c:a aac -b:a 224k -strict experimental output.mkv
 
+# Convert MP4 into MKV without re-encoding, making the conversion faster and preventing quality.
+ffmpeg -i input.mp4 -c copy output.mkv
+
+# Using subtitles
+-c:s copy                    # using the subtitles without a change from the source (best choise)
+-c:s mov_text                # Subtitles are embedded in the video.
+-scodec srt                  # save as separate file
+-vf "subtitles=input.srt"    # Hardcoding (burns the subtitle into the videofile)
+
+
 
 
 ::264
 # Better quality with x264 (but a little bit slower encoding speed)
--x264opts fast_pskip=0 , -profile:v high , -level 4.1
+-x264opts fast_pskip=0 , -profile:v high , -level 4.1 or -level 4.2
 
 # Enables adaptive quantization for better-quality detail retention.
 # Sets the maximum number of B-frames between I/P-frames to improve compression efficiency.
@@ -143,7 +202,8 @@ ffmpeg -i input-video.mp4 output-audio.mp3
 ffmpeg -i input.wav -compression_level 5 output.flac
 
 # Convert into Opus
-ffmpeg -i input.wav opusenc --bitrate 192 output.opus
+ffmpeg -i input.wav opusenc --bitrate 256k output.opus
+ffmpeg -i input.mp3 -c:a libopus -b:a 256k output.opus
 
 # Convert into OGG Vorbis (with quality settings)
 ffmpeg -i input.wav oggenc -q5 output.ogg
