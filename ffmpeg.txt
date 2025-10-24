@@ -1,24 +1,24 @@
 
-#
-# FFMPEG Converter
-#
+ #                  #
+ # FFMPEG Converter #
+ #      README      #   
 
-USAGE: 
-# windows (powershell, cmd) 
-ffmpeg [Global_OPTIONS] [SOURCE OPTIONS] -i SOURCEFILE [TARGETFILE OPTIONS] TARGETFILE 
+ USAGE: 
+ # windows (powershell, cmd) 
+ ffmpeg [Global_OPTIONS] [SOURCE OPTIONS] -i SOURCEFILE [TARGETFILE OPTIONS] TARGETFILE 
 
-# linux konsole
-ffmpeg [Global_OPTIONS] [SOURCE OPTIONS] -i SOURCEFILE [TARGETFILE OPTIONS] TARGETFILE    
+ # linux konsole
+ ffmpeg [Global_OPTIONS] [SOURCE OPTIONS] -i SOURCEFILE [TARGETFILE OPTIONS] TARGETFILE    
 
-# run ffmpeg with higher priority (more cpu time) 
-# (realtime priority is not recommended because system instability)
-# start /HIGH ffmpeg -i         
-# start /abovenormal ffmpeg -i
-# linux: nice -n -10 ffmpeg -i 
+ # Run ffmpeg with higher priority (more cpu time) 
+ # (realtime priority is not recommended because system instability)
+ # start /HIGH ffmpeg -i         
+ # start /abovenormal ffmpeg -i
+ # linux: nice -n -10 ffmpeg -i 
 
-!! Issues with Space in Filenames in FFmpeg !!
-# Use Quotation Marks ("")
-# ffmpeg -i "My Audio File.mp3" -c:a libopus output.opus
+ !! Issues with Space in Filenames in FFmpeg !!
+ # Use Quotation Marks ("")
+ # ffmpeg -i "My Audio File.mp3" -c:a libopus output.opus
 
 
 ### Example to use ffmpeg in a script (cmd)
@@ -61,13 +61,16 @@ If you want a 10 MB file for a video that is 50 seconds long:
 
 
 
-## FFMPEG Options and tweaks
+### FFMPEG Options and tweaks
 
 # Metadata from source file to targetfile
 ffmpeg -i <sourcefile> -map_metadata 0 -movflags use_metadata_tags
 
-# video scale (from 4k to fhd etc)
+# Video scale (from 4k to fhd etc)
 ffmpeg -i input.mp4 -vf "scale=1920x1080" output.mp4
+
+# Video scaling with high quality (langczos filter)
+ffmpeg -i input.mp4 -vf "scale=1920:1080:flags=lanczos"
 
 # Preset superfast is like realtime. You should use that instead of -preset ultrafast. 
 # Ultrafast is far less efficient compression than superfast.
@@ -95,6 +98,8 @@ ffmpeg -i input.mp4 -c copy output.mkv
 -vf "subtitles=input.srt"    # Hardcoding (burns the subtitle into the videofile)
 
 
+# Convert all .mp4 to mkv and shutdown the pc (navigate with cd to the location with the video file before)
+for %f in (*.mp4) do ffmpeg -i "%f" -c:v libx265 -crf 23 -c:a copy "%~nf.mkv" && shutdown /s /t 0
 
 
 ::264
@@ -140,7 +145,7 @@ ffmpeg -i input.mp4 -c copy output.mkv
 # Only pv output (No warnings etc)
 -v quiet
 
-
+ #######
 
 
 - Convert Video

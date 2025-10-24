@@ -1,0 +1,70 @@
+
+#          GStreamer How‑to            
+# High‑Quality Video, Audio Conversion 
+#                                      
+
+Syntax: (Use "!" to link elements in a GStreamer pipeline.)
+gst-launch-1.0 [options] <pipeline‑description>
+gst-launch-1.0 filesrc location=in.mkv ! decodebin ! videoconvert ! x264enc ! mp4mux ! filesink out.mp4
+
+## Options
+
+# Constant Video bitrate
+x264enc bitrate=5000
+x265enc bitrate=5000
+
+# Variable Video bitrate (VBR can combined with vbv‑maxrate/vbv‑buf‑size)
+x264enc target-bitrate=5000
+x265enc target-bitrate=5000
+
+# Convertion speed fast (medium is the default) (veryfast is realtime, on the fly)
+x264enc bitrate=5000 speed-preset=fast , slow , slower
+
+# Video scaling (720p in this example)
+ videoscale ! video/x-raw,width=1280,height=720
+ 
+# Encode to YUV420 (most hardware decoders expect this)
+videoconvert ! video/x-raw,format=YUV420
+
+# Use videofilter film and performs more detailed analysis of the video to maintain high quality throughout
+x265enc tune=film pass=qualitative
+
+# Buffers the streams to ensure smooth processing.
+queue ! videoconvert
+queue ! audioconvert
+
+# Using denoise (hqdn3d) and decomb as deinterlace method
+! videoconvert ! hqdn3d ! deinterlace method=decomb
+
+
+- Video
+::264
+# Convert to H.264 (x264) with constant bitrate + AAC
+gst-launch-1.0 filesrc location="input.mkv" ! decodebin name=dec dec. ! queue ! videoconvert ! video/x-raw,format=YUV420 ! x264enc bitrate=5000 speed-preset=fast tune=zerolatency ! h264parse ! mp4mux name=mux dec. ! queue ! audioconvert ! audioresample ! avenc_aac bitrate=192000 ! aacparse ! mux. filesink location="output_h264.mp4"
+
+# Conversion to x264 Using CRF
+gst-launch-1.0 -e filesrc location=input.mp4 ! decodebin ! x264enc tune=zerolatency bitrate=0 speed-preset=medium crf=23 ! muxer. audiototemux ! faac bitrate=224000 ! muxer. mp4mux name=muxer ! filesink location=output_x264.mp4
+
+::265
+# Convert to HEVC/H.265 (x265) with constant bitrate + AAC
+gst-launch-1.0 filesrc location="input.mkv" ! decodebin name=dec dec. ! queue ! videoconvert ! video/x-raw,format=YUV420 ! x265enc bitrate=4000 speed-preset=fast ! h265parse ! mp4mux name=mux dec. ! queue ! audioconvert ! audioresample ! avenc_aac bitrate=192000 ! aacparse ! mux. filesink location="output_h265.mp4"
+
+# Conversion to x265 Using CRF
+gst-launch-1.0 -e filesrc location=input.mp4 ! decodebin ! x265enc tune=zerolatency bitrate=0 speed-preset=medium crf=28 ! muxer. audiototemux ! faac bitrate=224000 ! muxer. mp4mux name=muxer ! filesink location=output_x265.mp4
+
+
+- Subtitle handling
+
+# Soft‑mux subtitles (separate track)
+gst-launch-1.0 filesrc location="input.mkv" ! matroskademux name=demux demux.video_0 ! queue ! decodebin ! videoconvert ! x264enc bitrate=5000 speed-preset=fast ! h264parse ! mp4mux name=mux ! filesink location="output_h264_submux.mp4" demux.audio_0 ! queue ! decodebin ! audioconvert ! audioresample ! avenc_aac bitrate=192000 ! aacparse ! mux. demux.subtitle_0 ! queue ! subparse ! mux.
+
+# Copy the subtitles from the source
+gst-launch-1.0 -e filesrc location=input_video.mkv ! matroskademux name=demux demux. ! queue ! x265enc tune=zerolatency bitrate=0 speed-preset=medium !mp4mux name=mux ! filesink location=output_video.mp4 demux. ! queue ! aacenc bitrate=224000 ! mux. demux. ! queue ! subparse ! mux.
+
+
+
+- Audio
+
+# Extract audio from a videofile and convert to aac 256kbps
+gst-launch-1.0 filesrc location="video.mp4" ! qtdemux name=demux demux.audio_0 ! queue ! decodebin ! audioconvert ! audioresample ! avenc_aac bitrate=256000 ! aacparse ! filesink location="audio_256kbps.aac"
+
