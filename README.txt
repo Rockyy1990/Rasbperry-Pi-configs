@@ -5,7 +5,7 @@ Last Edit: 10.10.2025
 # Upstream DNS
 #
 
-https://dns.cloudflare.com/dns-query
+1.1.1.1
 9.9.9.9
 208.67.222.222
 2606:4700:4700::1111
@@ -55,12 +55,79 @@ https://dns.cloudflare.com/dns-query
 ^https?://(www\.)?livejasmin\.com/(en|de|fr)/[a-zA-Z0-9_-]+$
 ^https?://(www\.)?xhamsterlive\.com/(en|de|fr)/[a-zA-Z0-9_-]+$
 
+#
+# Custom Rules Adguard Home
+#
+
+/^(.+[_.-])?adse?rv(er?|ice)?s?[0-9]*/
+/^pixels?[-.]*/
+^stat(s|istics)?[0-9]*[_.-]
+/.*ads./*
+.*\.tracking\..*
+^https?://(www\.)?livejasmin\.com/(en|de|fr)/[a-zA-Z0-9_-]+$
 ^https?://[^/]+/.*(adserver|ads|advert|advertising|banner|track|tracker|pixel|collect|doubleclick|googlesyndication|
 ^https?://[^/]+/.*(google-analytics|ga|gtm|googletagmanager|collect|analytics)
-^https?://[^/]+/.*(facebook|twitter).(com|net|org)
 ^https?://[^/]+/.*(criteo|openx|rubicon|pulse|appnexus|adnxs|advertising|adsystem)
-^https?://[^/]+/.*(doubleclick|googlevideo|videoad|adservice|adsbygoogle)
+||ecs.office.com^$important
+||office.com^$important
+||detectportal.firefox.com^$important
+||firefox.settings.services.mozilla.com^$important
+||css.hotnakedwomen.com^$important
+||facebook.com^$important
+||de-de.facebook.com^$important
+||static.xx.fbcdn.net^$important
+||ic-ut-nss.xhcdn.com^$important
+||stripchatgirls.com^$important
+||www.gstatic.com^$important
+||static-lvlt.xhcdn.com^$important
+||content-signature-2.cdn.mozilla.net^$important
+||static-nss.xhcdn.com^$important
+||ic-nss.flixcdn.com^$important
+||cdn.hotnakedwomen.com^$important
+||creative.xlivrdr.com^$important
+||support.mozilla.org^$important
+||cdn81960837.ahacdn.me^$important
+||www.wisecleaner.net^$important
+||xhamsterlive.com^$important
+||encrypted-tbn3.gstatic.com^$important
+||fonts.gstatic.com^$important
+||ei.phncdn.com.sds.rncdn7.com^$important
+||ei.phncdn.com^$important
+||p2p-fra1.discovery.steamserver.net^$important
+||3cx.com/smb/^$important
+||google-analytics^$important
+||yt4.ggpht.com^$important
+||photos-ugc.l.googleusercontent.com^$important
+||a1967.dscr.akamai.net^$important
+||atruvia.scene7.com^$important
+||cdni.hotnakedwomen.com^$important
+||p2p-ams1.discovery.steamserver.net^$important
+@@||www.chaturbate.com^$important
+@@||de.chaturbate.com^$important
 
+DNS Rebind Protection 
+ IPv4
+! Private
+/^10\.(?:\d{1,3})\.(?:\d{1,3})\.(?:\d{1,3})$/
+/^172\.(?:1[6-9]|2\d|3[0-1])\.(?:\d{1,3})\.(?:\d{1,3})$/
+/^192\.168\.(?:\d{1,3})\.(?:\d{1,3})$/
+! Link-Local
+/^169\.254\.(?:\d{1,3})\.(?:\d{1,3})$/
+! Loopback
+/^127\.(?:\d{1,3})\.(?:\d{1,3})\.(?:\d{1,3})$/
+! Unspecified
+/^0\.0\.0\.(?:\d{1,3})$/
+! IPv6
+! Unique Local Address (ULA)
+/^f[cd][0-9a-f]{2}:/
+! Link-Local
+/^fe80:/
+! Loopback
+/^::1$/
+! Unspecified
+/^::$/
+! Host
+/^([a-z0-9\-]+\.)?(localhost|localdomain|ip6-localhost)$/
 
 
 #
@@ -121,8 +188,7 @@ https://raw.githubusercontent.com/crpietschmann/pi-hole-blocklist/main/social-me
 Tiktok
 https://raw.githubusercontent.com/crpietschmann/pi-hole-blocklist/main/social-media/blocklist-social-tiktok.txt
 
-Jugendschutz
-https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/child-protection
+
 
 
 
@@ -145,11 +211,23 @@ https://adguardteam.github.io/HostlistsRegistry/assets/filter_49.txt
 HaGeZis Anti-Privacy
 https://adguardteam.github.io/HostlistsRegistry/assets/filter_46.txt
 
+Entropy Domains
+https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/domains/dga14.txt
+https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/domains/dga30.txt
+
+DNS bypass Blocklist
+https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/domains/doh.txt
+
 Roku Blocklist
 https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/domains/native.roku.txt
 
 
+Jugendschutz
+https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/child-protection
 
+Porn Blocklists
+https://raw.githubusercontent.com/RPiList/specials/refs/heads/master/Blocklisten/pornblock1
+https://raw.githubusercontent.com/RPiList/specials/refs/heads/master/Blocklisten/pornblock2
 
 
 
