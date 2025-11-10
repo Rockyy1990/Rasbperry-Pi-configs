@@ -1,5 +1,5 @@
 
-Last Edit: 31.10.2025
+Last Edit: 10.11.2025
 
 #
 # Upstream DNS
@@ -105,8 +105,16 @@ Last Edit: 31.10.2025
 @@||www.chaturbate.com^$important
 @@||de.chaturbate.com^$important
 
-DNS Rebind Protection 
- IPv4
+
+
+! Title: HaGeZi's DNS Rebind Protection
+! Description: DNS Rebind Protection is a security mechanism that prevents attackers from manipulating DNS responses to make a domain resolve to private or local IP addresses, thereby blocking malicious scripts from accessing internal networks through DNS rebinding attacks.
+! Homepage: https://github.com/hagezi/dns-blocklists
+! License: https://github.com/hagezi/dns-blocklists/blob/main/LICENSE
+! Issues: https://github.com/hagezi/dns-blocklists/issues
+! Syntax: AdGuard (Regex)
+! 
+! IPv4
 ! Private
 /^10\.(?:\d{1,3})\.(?:\d{1,3})\.(?:\d{1,3})$/
 /^172\.(?:1[6-9]|2\d|3[0-1])\.(?:\d{1,3})\.(?:\d{1,3})$/
@@ -128,6 +136,22 @@ DNS Rebind Protection
 /^::$/
 ! Host
 /^([a-z0-9\-]+\.)?(localhost|localdomain|ip6-localhost)$/
+
+! Title: HaGeZi's Apple Private Relay/DNS Bypass
+! Description: Blocks Apple Private Relay and possible Apple DNS bypasses correctly.
+! Homepage: https://github.com/hagezi/dns-blocklists
+! License: https://github.com/hagezi/dns-blocklists/blob/main/LICENSE
+! Issues: https://github.com/hagezi/dns-blocklists/issues
+! Syntax: AdGuard Home/DNS
+! 
+||mask.icloud.com^$dnsrewrite=NXDOMAIN
+||mask-h2.icloud.com^$dnsrewrite=NXDOMAIN
+||mask-canary.icloud.com^$dnsrewrite=NXDOMAIN
+||doh.dns.apple.com^$dnsrewrite=NXDOMAIN
+||doh-dns-apple-com.v.aaplimg.com^$dnsrewrite=NXDOMAIN
+||doh.dns.apple.com.v.aaplimg.com^$dnsrewrite=NXDOMAIN
+||_dns.resolver.arpa^$dnsrewrite=NXDOMAIN
+
 
 
 #
@@ -161,6 +185,7 @@ https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/proxies
 
 Gambling
 https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/gambling
+https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/gambling.mini.txt
 
 
 Streaming
@@ -217,6 +242,13 @@ https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/domains/
 
 DNS bypass Blocklist
 https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/domains/doh.txt
+
+HaGeZi's Pro DNS Blocklist
+https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/domains/pro.txt
+
+DNS-Blocklist_IPs
+https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/ips/doh.txt
+
 
 Roku Blocklist
 https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/domains/native.roku.txt
